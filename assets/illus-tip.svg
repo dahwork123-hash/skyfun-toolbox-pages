@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+  <!-- Q 版燈泡小精靈 -->
+  <circle cx="32" cy="36" r="22" fill="#FEF9C3" stroke="#FACC15" stroke-width="2.5"/>
+  <path d="M26 56c0 3.3 2.7 6 6 6s6-2.7 6-6" stroke="#CA8A04" stroke-width="2.5" stroke-linecap="round"/>
+  <rect x="28" y="56" width="8" height="4" rx="2" fill="#EAB308"/>
+  <path d="M22 18c2-8 10-12 18-10 6 1.5 10 7 10 14 0 2-1 4-2 5l-2 4h-20l-2-4c-1-1-2-3-2-5z" fill="#FDE047" stroke="#EAB308" stroke-width="2.5" stroke-linejoin="round"/>
+  <circle cx="26" cy="30" r="4.5" fill="#fff" stroke="#713F12" stroke-width="2"/>
+  <circle cx="38" cy="30" r="4.5" fill="#fff" stroke="#713F12" stroke-width="2"/>
+  <circle cx="27.5" cy="29" r="1.6" fill="#713F12"/>
+  <circle cx="39.5" cy="29" r="1.6" fill="#713F12"/>
+  <path d="M27 36 Q32 40 37 36" stroke="#713F12" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+  <ellipse cx="22" cy="34" rx="3" ry="2" fill="#FDA4AF" fill-opacity="0.6"/>
+  <ellipse cx="42" cy="34" rx="3" ry="2" fill="#FDA4AF" fill-opacity="0.6"/>
+  <path d="M32 8l1.5 4 4 1-4 1-1.5 4-1.5-4-4-1 4-1z" fill="#FDE68A" stroke="#F59E0B" stroke-width="1"/>
+  <path d="M48 14l1 2.5 2.5 1-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1z" fill="#BAE6FD" stroke="#38BDF8" stroke-width="0.8"/>
+</svg>

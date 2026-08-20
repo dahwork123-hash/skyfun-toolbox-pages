@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>帳號核准 — 星鴻工具箱</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <style>
+    body { font-family: system-ui, "Microsoft JhengHei", sans-serif; background: #0c1222; color: #e2e8f0; min-height: 100vh; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 1rem; }
+    input, select { background: #0f172a; border: 1px solid #475569; border-radius: 0.5rem; padding: 0.5rem 0.75rem; color: #f8fafc; width: 100%; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    th, td { padding: 0.65rem 0.5rem; text-align: left; border-bottom: 1px solid #334155; }
+    th { color: #94a3b8; font-weight: 700; }
+    .badge-pending { background: #78350f; color: #fcd34d; font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 0.35rem; }
+    .badge-on { background: #064e3b; color: #6ee7b7; font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 0.35rem; }
+    .badge-off { background: #4c0519; color: #fda4af; font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 0.35rem; }
+    .badge-rejected { background: #7f1d1d; color: #fecaca; font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 0.35rem; }
+    .act-btn { border: 0; border-radius: 0.45rem; padding: 0.25rem 0.55rem; font-size: 0.75rem; font-weight: 700; cursor: pointer; margin-right: 0.25rem; }
+    .act-ok { background: #15803d; color: #fff; }
+    .act-warn { background: #b45309; color: #fff; }
+    .act-danger { background: #b91c1c; color: #fff; }
+  </style>
+</head>
+<body class="p-4 md:p-8 max-w-5xl mx-auto space-y-6">
+  <header>
+    <h1 class="text-2xl font-black text-teal-300">帳號核准後台</h1>
+    <p class="text-slate-400 text-sm mt-1">與 Render 完整版共用 Supabase 帳號 · <a class="text-teal-300 underline" href="../index.html">回工具箱</a></p>
+  </header>
+
+  <section class="card p-4 space-y-3" id="login-panel">
+    <label class="block text-sm text-slate-400">後台密碼（Supabase admin_secret）</label>
+    <div class="flex flex-wrap gap-2">
+      <input type="password" id="admin-secret" placeholder="後台密碼" class="flex-1 min-w-[12rem]" />
+      <button type="button" id="btn-login" class="px-4 py-2 rounded-lg bg-teal-600 text-white font-bold">連線</button>
+    </div>
+    <p class="text-xs text-slate-500">預設為 schema.sql 內設定值，請在 Supabase 改掉。</p>
+    <p id="login-msg" class="text-sm text-rose-300 hidden"></p>
+  </section>
+
+  <section class="card p-4 hidden space-y-3" id="main-panel">
+    <div class="flex flex-wrap items-end gap-3">
+      <div class="min-w-[10rem]">
+        <label class="block text-xs text-slate-400 mb-1">篩選狀態</label>
+        <select id="filter">
+          <option value="pending">待核准</option>
+          <option value="">全部</option>
+          <option value="active">已核准</option>
+          <option value="rejected">已拒絕</option>
+          <option value="disabled">已停用</option>
+        </select>
+      </div>
+      <button type="button" id="btn-refresh" class="text-sm px-3 py-1.5 rounded-lg border border-slate-600">重新整理</button>
+      <p class="text-sm text-slate-400" id="count">—</p>
+    </div>
+    <p id="msg" class="text-sm text-slate-400"></p>
+    <div class="overflow-x-auto">
+      <table>
+        <thead>
+          <tr><th>帳號</th><th>顯示名稱</th><th>狀態</th><th>註冊時間</th><th>操作</th></tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <script>
+    (function () {
+      const SECRET_KEY = 'skyfun-pages-admin-secret';
+      let client = null;
+      let secret = '';
+
+      function cfg() {
+        const c = window.SKYFUN_SUPABASE || {};
+        return { url: String(c.url || '').trim(), anonKey: String(c.anonKey || '').trim() };
+      }
+
+      function sb() {
+        if (client) return client;
+        const { url, anonKey } = cfg();
+        client = window.supabase.createClient(url, anonKey);
+        return client;
+      }
+
+      async function rpc(name, args) {
+        const { data, error } = await sb().rpc(name, args);
+        if (error) throw new Error(error.message || 'Supabase 錯誤');
+        return data;
+      }
+
+      function badge(status) {
+        const map = {
+          pending: ['badge-pending', '待核准'],
+          active: ['badge-on', '已核准'],
+          disabled: ['badge-off', '已停用'],
+          rejected: ['badge-rejected', '已拒絕']
+        };
+        const [cls, label] = map[status] || ['badge-off', status];
+        return `<span class="${cls}">${label}</span>`;
+      }
+
+      function fmt(iso) {
+        if (!iso) return '—';
+        try { return new Date(iso).toLocaleString('zh-TW'); } catch { return iso; }
+      }
+
+      async function loadList() {
+        const status = document.getElementById('filter').value;
+        const data = await rpc('toolbox_admin_list', { p_secret: secret, p_status: status || null });
+        if (!data?.ok) throw new Error(data?.error || '讀取失敗');
+        const users = data.users || [];
+        document.getElementById('count').textContent = `共 ${users.length} 筆`;
+        document.getElementById('rows').innerHTML = users.map((u) => {
+          const acts = [];
+          if (u.status === 'pending') {
+            acts.push(`<button type="button" class="act-btn act-ok" data-act="active" data-id="${u.id}">核准</button>`);
+            acts.push(`<button type="button" class="act-btn act-danger" data-act="rejected" data-id="${u.id}">拒絕</button>`);
+          } else if (u.status === 'active') {
+            acts.push(`<button type="button" class="act-btn act-warn" data-act="disabled" data-id="${u.id}">停用</button>`);
+          } else if (u.status === 'disabled' || u.status === 'rejected') {
+            acts.push(`<button type="button" class="act-btn act-ok" data-act="active" data-id="${u.id}">重新核准</button>`);
+          }
+          return `<tr>
+            <td>${u.username || '—'}</td>
+            <td>${u.name || '—'}</td>
+            <td>${badge(u.status)}</td>
+            <td>${fmt(u.createdAt)}</td>
+            <td>${acts.join('') || '—'}</td>
+          </tr>`;
+        }).join('');
+        document.getElementById('msg').textContent = '';
+      }
+
+      async function setStatus(id, status) {
+        const data = await rpc('toolbox_admin_set_status', {
+          p_secret: secret,
+          p_user_id: id,
+          p_status: status,
+          p_note: null
+        });
+        if (!data?.ok) throw new Error(data?.error || '更新失敗');
+        await loadList();
+      }
+
+      document.getElementById('btn-login').addEventListener('click', async () => {
+        secret = document.getElementById('admin-secret').value.trim();
+        const msg = document.getElementById('login-msg');
+        msg.classList.add('hidden');
+        try {
+          const data = await rpc('toolbox_admin_list', { p_secret: secret, p_status: 'pending' });
+          if (!data?.ok) throw new Error(data?.error || '後台密碼錯誤');
+          sessionStorage.setItem(SECRET_KEY, secret);
+          document.getElementById('login-panel').classList.add('hidden');
+          document.getElementById('main-panel').classList.remove('hidden');
+          await loadList();
+        } catch (e) {
+          msg.textContent = e.message || '連線失敗';
+          msg.classList.remove('hidden');
+        }
+      });
+
+      document.getElementById('btn-refresh').addEventListener('click', () => loadList().catch((e) => {
+        document.getElementById('msg').textContent = e.message;
+      }));
+
+      document.getElementById('filter').addEventListener('change', () => loadList().catch(() => {}));
+
+      document.getElementById('rows').addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-act]');
+        if (!btn) return;
+        setStatus(btn.dataset.id, btn.dataset.act).catch((err) => {
+          document.getElementById('msg').textContent = err.message;
+        });
+      });
+
+      const saved = sessionStorage.getItem(SECRET_KEY);
+      if (saved) {
+        document.getElementById('admin-secret').value = saved;
+      }
+    })();
+  </script>
+</body>
+</html>

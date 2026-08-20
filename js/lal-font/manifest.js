@@ -1,0 +1,1 @@
+window.LAL_FONT_PART_COUNT=18;

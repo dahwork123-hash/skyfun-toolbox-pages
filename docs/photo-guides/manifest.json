@@ -1,0 +1,272 @@
+{
+  "regions": {
+    "shuangbei": {
+      "label": "雙北",
+      "ppt": "./docs/photo-guides/雙北屋況照片拍攝重點.pptx",
+      "slides": [
+        {
+          "index": 1,
+          "id": "slide-01",
+          "title": "大門口與門牌拍攝規則",
+          "images": [
+            "./docs/photo-guides/slides/shuangbei/slide-01-01.png",
+            "./docs/photo-guides/slides/shuangbei/slide-01-02.png",
+            "./docs/photo-guides/slides/shuangbei/slide-01-03.png"
+          ]
+        },
+        {
+          "index": 2,
+          "id": "slide-02",
+          "title": "出入口及樓梯",
+          "images": [
+            "./docs/photo-guides/slides/shuangbei/slide-02-01.png",
+            "./docs/photo-guides/slides/shuangbei/slide-02-02.png",
+            "./docs/photo-guides/slides/shuangbei/slide-02-03.png"
+          ]
+        },
+        {
+          "index": 3,
+          "id": "slide-03",
+          "title": "衛浴",
+          "images": [
+            "./docs/photo-guides/slides/shuangbei/slide-03-01.png",
+            "./docs/photo-guides/slides/shuangbei/slide-03-02.png",
+            "./docs/photo-guides/slides/shuangbei/slide-03-03.png"
+          ]
+        },
+        {
+          "index": 4,
+          "id": "slide-04",
+          "title": "偵煙器（住警器）拍攝規則",
+          "images": [
+            "./docs/photo-guides/slides/shuangbei/slide-04-01.jpg",
+            "./docs/photo-guides/slides/shuangbei/slide-04-02.png",
+            "./docs/photo-guides/slides/shuangbei/slide-04-03.jpg"
+          ]
+        },
+        {
+          "index": 5,
+          "id": "slide-05",
+          "title": "滅火器",
+          "images": [
+            "./docs/photo-guides/slides/shuangbei/slide-05-01.jpg",
+            "./docs/photo-guides/slides/shuangbei/slide-05-02.png",
+            "./docs/photo-guides/slides/shuangbei/slide-05-03.png"
+          ]
+        },
+        {
+          "index": 6,
+          "id": "slide-06",
+          "title": "熱水器（電熱水器）",
+          "images": [
+            "./docs/photo-guides/slides/shuangbei/slide-06-01.png",
+            "./docs/photo-guides/slides/shuangbei/slide-06-02.png"
+          ]
+        },
+        {
+          "index": 7,
+          "id": "slide-07",
+          "title": "熱水器（室內強排）",
+          "images": [
+            "./docs/photo-guides/slides/shuangbei/slide-07-01.png",
+            "./docs/photo-guides/slides/shuangbei/slide-07-02.jpg",
+            "./docs/photo-guides/slides/shuangbei/slide-07-03.jpg"
+          ]
+        },
+        {
+          "index": 8,
+          "id": "slide-08",
+          "title": "熱水器（室外）",
+          "images": [
+            "./docs/photo-guides/slides/shuangbei/slide-08-01.png",
+            "./docs/photo-guides/slides/shuangbei/slide-08-02.png"
+          ]
+        },
+        {
+          "index": 9,
+          "id": "slide-09",
+          "title": "熱水器強排出口（特殊情況）",
+          "images": [
+            "./docs/photo-guides/slides/shuangbei/slide-09-01.jpg",
+            "./docs/photo-guides/slides/shuangbei/slide-09-02.png"
+          ]
+        }
+      ]
+    },
+    "taichung": {
+      "label": "台中",
+      "ppt": "./docs/photo-guides/台中_屋況照片拍攝重點.pptx",
+      "slides": [
+        {
+          "index": 1,
+          "id": "slide-01",
+          "title": "熱水器拍攝規則（戶外）",
+          "images": [
+            "./docs/photo-guides/slides/taichung/slide-01-01.jpg",
+            "./docs/photo-guides/slides/taichung/slide-01-02.jpg",
+            "./docs/photo-guides/slides/taichung/slide-01-03.jpg"
+          ]
+        },
+        {
+          "index": 2,
+          "id": "slide-02",
+          "title": "熱水器拍攝規則（室內）",
+          "images": [
+            "./docs/photo-guides/slides/taichung/slide-02-01.png",
+            "./docs/photo-guides/slides/taichung/slide-02-02.png",
+            "./docs/photo-guides/slides/taichung/slide-02-03.png",
+            "./docs/photo-guides/slides/taichung/slide-02-04.jpg"
+          ]
+        },
+        {
+          "index": 3,
+          "id": "slide-03",
+          "title": "浴室拍攝規則（蓮蓬頭／洗手台／馬桶）",
+          "images": [
+            "./docs/photo-guides/slides/taichung/slide-03-01.jpg",
+            "./docs/photo-guides/slides/taichung/slide-03-02.jpg",
+            "./docs/photo-guides/slides/taichung/slide-03-03.jpg"
+          ]
+        },
+        {
+          "index": 4,
+          "id": "slide-04",
+          "title": "住家門口拍攝規則（門牌／信箱）",
+          "images": [
+            "./docs/photo-guides/slides/taichung/slide-04-01.jpg",
+            "./docs/photo-guides/slides/taichung/slide-04-02.jpg",
+            "./docs/photo-guides/slides/taichung/slide-04-03.jpg",
+            "./docs/photo-guides/slides/taichung/slide-04-04.jpg",
+            "./docs/photo-guides/slides/taichung/slide-04-05.jpg",
+            "./docs/photo-guides/slides/taichung/slide-04-06.jpg"
+          ]
+        },
+        {
+          "index": 5,
+          "id": "slide-05",
+          "title": "社區入口拍攝規則",
+          "images": [
+            "./docs/photo-guides/slides/taichung/slide-05-01.jpg",
+            "./docs/photo-guides/slides/taichung/slide-05-02.png"
+          ]
+        },
+        {
+          "index": 6,
+          "id": "slide-06",
+          "title": "滅火器、偵煙器拍攝規則",
+          "images": [
+            "./docs/photo-guides/slides/taichung/slide-06-01.jpg",
+            "./docs/photo-guides/slides/taichung/slide-06-02.jpg",
+            "./docs/photo-guides/slides/taichung/slide-06-03.jpg",
+            "./docs/photo-guides/slides/taichung/slide-06-04.jpg",
+            "./docs/photo-guides/slides/taichung/slide-06-05.jpg",
+            "./docs/photo-guides/slides/taichung/slide-06-06.jpg"
+          ]
+        },
+        {
+          "index": 7,
+          "id": "slide-07",
+          "title": "逃生梯拍攝規則",
+          "images": [
+            "./docs/photo-guides/slides/taichung/slide-07-01.jpg",
+            "./docs/photo-guides/slides/taichung/slide-07-02.jpg",
+            "./docs/photo-guides/slides/taichung/slide-07-03.jpeg"
+          ]
+        }
+      ]
+    },
+    "taoyuan": {
+      "label": "桃園",
+      "ppt": "",
+      "slides": [
+        { "index": 1, "id": "slide-01", "title": "門牌及大門", "images": [] },
+        { "index": 2, "id": "slide-02", "title": "衛浴設備", "images": [] },
+        { "index": 3, "id": "slide-03", "title": "出入口及樓梯", "images": [] },
+        { "index": 4, "id": "slide-04", "title": "滅火器", "images": [] },
+        { "index": 5, "id": "slide-05", "title": "住警器", "images": [] },
+        { "index": 6, "id": "slide-06", "title": "熱水器（室內強排）", "images": [] },
+        { "index": 7, "id": "slide-07", "title": "熱水器（室外／陽台）", "images": [] }
+      ]
+    }
+  },
+  "photoPreviewMap": {
+    "shuangbei": {
+      "door-plate": { "slide": "slide-01", "indices": [2] },
+      "door-entrance": { "slide": "slide-01", "indices": [1] },
+      "door-mailbox": { "slide": "slide-01", "indices": [3] },
+      "bath-toilet": { "slide": "slide-03", "indices": [2] },
+      "bath-sink": { "slide": "slide-03", "indices": [1] },
+      "bath-shower": { "slide": "slide-03", "indices": [3] },
+      "exit-in": { "slide": "slide-02", "indices": [1] },
+      "exit-out": { "slide": "slide-02", "indices": [1] },
+      "stairs-down": { "slide": "slide-02", "indices": [2] },
+      "stairs-up": { "slide": "slide-02", "indices": [3] },
+      "fire-blank": { "slide": "slide-05", "indices": [1] },
+      "fire-cert": { "slide": "slide-05", "indices": [3] },
+      "fire-far": { "slide": "slide-05", "indices": [1] },
+      "fire-expiry": { "slide": "slide-05", "indices": [2] },
+      "fire-serial": { "slide": "slide-05", "indices": [2] },
+      "alarm-blank": { "slide": "slide-04", "indices": [1] },
+      "alarm-far": { "slide": "slide-04", "indices": [1] },
+      "alarm-close": { "slide": "slide-04", "indices": [2] },
+      "heater-unit": { "slide": "slide-06", "indices": [1] },
+      "heater-vent": { "slide": "slide-07", "indices": [1] },
+      "heater-env": { "slide": "slide-08", "indices": [1] },
+      "indoor-equip": null,
+      "room-panorama": null
+    },
+    "taichung": {
+      "door-plate": { "slide": "slide-04", "indices": [1, 3] },
+      "door-entrance": { "slide": "slide-05", "indices": [1, 2] },
+      "door-mailbox": { "slide": "slide-04", "indices": [4] },
+      "bath-toilet": { "slide": "slide-03", "indices": [2] },
+      "bath-sink": { "slide": "slide-03", "indices": [1] },
+      "bath-shower": { "slide": "slide-03", "indices": [3] },
+      "exit-in": { "slide": "slide-04", "indices": [2] },
+      "exit-out": { "slide": "slide-04", "indices": [2] },
+      "stairs-down": { "slide": "slide-07", "indices": [1] },
+      "stairs-up": { "slide": "slide-07", "indices": [2, 3] },
+      "fire-blank": { "slide": "slide-06", "indices": [5] },
+      "fire-cert": { "slide": "slide-06", "indices": [1] },
+      "fire-far": { "slide": "slide-06", "indices": [6] },
+      "fire-expiry": { "slide": "slide-06", "indices": [4] },
+      "fire-serial": { "slide": "slide-06", "indices": [4] },
+      "alarm-blank": { "slide": "slide-06", "indices": [2] },
+      "alarm-far": { "slide": "slide-06", "indices": [2] },
+      "alarm-close": { "slide": "slide-06", "indices": [3] },
+      "heater-unit": { "slide": "slide-01", "indices": [1, 2, 3] },
+      "heater-vent": { "slide": "slide-02", "indices": [1, 2] },
+      "heater-env": { "slide": "slide-02", "indices": [3, 4] },
+      "indoor-equip": null,
+      "room-panorama": null
+    },
+    "taoyuan": {
+      "door-plate": null,
+      "door-entrance": null,
+      "door-mailbox": null,
+      "bath-toilet": null,
+      "bath-sink": null,
+      "bath-shower": null,
+      "exit-in": null,
+      "exit-out": null,
+      "stairs-down": null,
+      "stairs-up": null,
+      "fire-blank": null,
+      "fire-cert": null,
+      "fire-far": null,
+      "fire-expiry": null,
+      "fire-serial": null,
+      "alarm-blank": null,
+      "alarm-far": null,
+      "alarm-close": null,
+      "heater-indoor-unit": null,
+      "heater-indoor-vent": null,
+      "heater-indoor-env": null,
+      "heater-outdoor-unit": null,
+      "heater-outdoor-vent": null,
+      "heater-outdoor-env": null,
+      "indoor-equip": null,
+      "room-panorama": null
+    }
+  }
+}

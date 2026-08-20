@@ -1,0 +1,5 @@
+# LINE Developers -> Messaging API -> Webhook URL
+
+https://ringtones-misc-buzz-defined.trycloudflare.com/line/webhook
+
+Tunnel changes when SkyfunTunnel restarts. Update api-base.json + redeploy Netlify + LINE Webhook.
