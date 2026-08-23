@@ -8837,12 +8837,22 @@
             return r.toLocaleString('zh-TW', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
         }
 
+        function deprefProrateSegIsPartial(seg) {
+            const overlap = seg.overlapLabel || '';
+            if (!overlap) return false;
+            const period = seg.cycleLabel || '';
+            if (period && overlap === period) return false;
+            const days = Number(seg.days);
+            const cycleDays = Number(seg.cycleDays);
+            return Number.isFinite(cycleDays) && cycleDays > 0 && days < cycleDays;
+        }
+
         function deprefProrateLineLabel(kind, seg, index) {
             const amt = Math.round(seg.amount);
             const period = seg.cycleLabel || '';
             const periodNote = period ? `租期 ${period}，` : '';
             const overlap = seg.overlapLabel || '';
-            const isPartial = overlap && Number(seg.days) < Number(seg.cycleDays || seg.days);
+            const isPartial = deprefProrateSegIsPartial(seg);
             const daysPart = isPartial
                 ? `${deprefFmtDaily(seg.dailyRent)} 元/天 × ${seg.days} 天（${overlap}）`
                 : `${deprefFmtDaily(seg.dailyRent)} 元/天 × ${seg.days} 天`;
