@@ -5714,20 +5714,21 @@
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div class="space-y-2">
                                 <label class="block text-slate-700 font-semibold text-sm">告知解約日</label>
-                                <input id="depref-notice-date" type="date" lang="zh-TW"
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200" />
+                                <input id="depref-notice-date" type="text" inputmode="numeric" autocomplete="off" placeholder="例：115/08/23" lang="zh-TW"
+                                       class="depref-date-roc w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200" />
                             </div>
                             <div class="space-y-2">
                                 <label class="block text-slate-700 font-semibold text-sm">實際解約日</label>
-                                <input id="depref-exit-full-date" type="date" lang="zh-TW"
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200" />
+                                <input id="depref-exit-full-date" type="text" inputmode="numeric" autocomplete="off" placeholder="例：115/08/23" lang="zh-TW"
+                                       class="depref-date-roc w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200" />
                             </div>
                             <div class="space-y-2">
                                 <label class="block text-slate-700 font-semibold text-sm">合約起租日</label>
-                                <input id="depref-lease-start-date" type="date" lang="zh-TW"
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200" />
+                                <input id="depref-lease-start-date" type="text" inputmode="numeric" autocomplete="off" placeholder="例：115/08/23" lang="zh-TW"
+                                       class="depref-date-roc w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200" />
                             </div>
                         </div>
+                        <p class="text-[11px] text-slate-500">日期請填<strong>民國年</strong>，例：115/08/23（亦支援 1150615、西元 2026/08/23 自動換算）</p>
                         <p id="depref-lease-rent-due-hint" class="text-[11px] text-indigo-900/90 font-semibold leading-relaxed"></p>
                         <p id="depref-notice-rule-hint" class="text-[11px] text-indigo-900 font-semibold leading-relaxed"></p>
                     </div>
@@ -5825,8 +5826,8 @@
                         <p class="text-sm md:text-base text-slate-800 font-semibold leading-relaxed border-l-4 border-rose-500 pl-3">試算區間為「首次欠繳之繳租日」至「實際解約日」（含首尾日）。已填 <strong>⓪ 合約起租日</strong>時：以起租日之「幾號」為<strong>每月繳租日</strong>界定每一期（例：每月 5 號繳租＝該期 <strong>本月 5 日～次月 4 日</strong>），<strong>日租金＝月租÷該期天數</strong>，再依與上開區間之重疊天數累加。未填起租日時，暫以曆法月分段試算。</p>
                         <div class="space-y-2">
                             <label class="block text-slate-900 font-bold text-base">首次欠繳之繳租日（該期應繳未繳的起始繳租日）</label>
-                            <input id="depref-first-missed-due-date" type="date" lang="zh-TW"
-                                   class="w-full px-4 py-3.5 border-2 border-rose-400 rounded-xl bg-white text-base focus:outline-none focus:ring-2 focus:ring-rose-300 shadow-sm" />
+                            <input id="depref-first-missed-due-date" type="text" inputmode="numeric" autocomplete="off" placeholder="例：115/08/23" lang="zh-TW"
+                                   class="depref-date-roc w-full px-4 py-3.5 border-2 border-rose-400 rounded-xl bg-white text-base focus:outline-none focus:ring-2 focus:ring-rose-300 shadow-sm" />
                         </div>
                         <p id="depref-billing-arrears-summary" class="text-base md:text-lg text-rose-950 font-bold leading-relaxed min-h-[3.5rem] bg-white/80 rounded-xl border border-rose-200/80 px-4 py-3"></p>
                         <ul id="depref-billing-arrears-detail" class="hidden rounded-xl border border-rose-100 bg-rose-50/60 px-4 py-2 space-y-0"></ul>
@@ -5971,20 +5972,21 @@
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div class="space-y-2">
                                 <label class="block text-slate-700 font-semibold text-sm">告知解約日</label>
-                                <input id="baoref-notice-date" type="date" lang="zh-TW"
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200" />
+                                <input id="baoref-notice-date" type="text" inputmode="numeric" autocomplete="off" placeholder="例：115/08/23" lang="zh-TW"
+                                       class="depref-date-roc w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200" />
                             </div>
                             <div class="space-y-2">
                                 <label class="block text-slate-700 font-semibold text-sm">實際解約日</label>
-                                <input id="baoref-exit-full-date" type="date" lang="zh-TW"
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200" />
+                                <input id="baoref-exit-full-date" type="text" inputmode="numeric" autocomplete="off" placeholder="例：115/08/23" lang="zh-TW"
+                                       class="depref-date-roc w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200" />
                             </div>
                             <div class="space-y-2">
                                 <label class="block text-slate-700 font-semibold text-sm">合約起租日</label>
-                                <input id="baoref-lease-start-date" type="date" lang="zh-TW"
-                                       class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200" />
+                                <input id="baoref-lease-start-date" type="text" inputmode="numeric" autocomplete="off" placeholder="例：115/08/23" lang="zh-TW"
+                                       class="depref-date-roc w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200" />
                             </div>
                         </div>
+                        <p class="text-[11px] text-slate-500">日期請填<strong>民國年</strong>，例：115/08/23（亦支援 1150615、西元 2026/08/23 自動換算）</p>
                         <p id="baoref-lease-rent-due-hint" class="text-[11px] text-indigo-900/90 font-semibold leading-relaxed"></p>
                         <p id="baoref-notice-rule-hint" class="text-[11px] text-indigo-900 font-semibold leading-relaxed"></p>
                     </div>
@@ -6082,8 +6084,8 @@
                         <p class="text-sm md:text-base text-slate-800 font-semibold leading-relaxed border-l-4 border-rose-500 pl-3">試算區間為「首次欠繳之繳租日」至「實際解約日」（含首尾日）。已填 <strong>⓪ 合約起租日</strong>時：以起租日之「幾號」為<strong>每月繳租日</strong>界定每一期（例：每月 5 號繳租＝該期 <strong>本月 5 日～次月 4 日</strong>），<strong>日租金＝月租÷該期天數</strong>，再依與上開區間之重疊天數累加。未填起租日時，暫以曆法月分段試算。</p>
                         <div class="space-y-2">
                             <label class="block text-slate-900 font-bold text-base">首次欠繳之繳租日（該期應繳未繳的起始繳租日）</label>
-                            <input id="baoref-first-missed-due-date" type="date" lang="zh-TW"
-                                   class="w-full px-4 py-3.5 border-2 border-rose-400 rounded-xl bg-white text-base focus:outline-none focus:ring-2 focus:ring-rose-300 shadow-sm" />
+                            <input id="baoref-first-missed-due-date" type="text" inputmode="numeric" autocomplete="off" placeholder="例：115/08/23" lang="zh-TW"
+                                   class="depref-date-roc w-full px-4 py-3.5 border-2 border-rose-400 rounded-xl bg-white text-base focus:outline-none focus:ring-2 focus:ring-rose-300 shadow-sm" />
                         </div>
                         <p id="baoref-billing-arrears-summary" class="text-base md:text-lg text-rose-950 font-bold leading-relaxed min-h-[3.5rem] bg-white/80 rounded-xl border border-rose-200/80 px-4 py-3"></p>
                         <ul id="baoref-billing-arrears-detail" class="hidden rounded-xl border border-rose-100 bg-rose-50/60 px-4 py-2 space-y-0"></ul>
@@ -8756,7 +8758,11 @@
                     el.addEventListener('input', run);
                     el.addEventListener('change', run);
                 });
-                root.querySelectorAll('input[type="date"]').forEach(function (el) {
+                root.querySelectorAll('.depref-date-roc').forEach(function (el) {
+                    el.addEventListener('blur', function () {
+                        normalizeDeprefRocDateInput(el);
+                        run();
+                    });
                     el.addEventListener('change', run);
                     el.addEventListener('input', run);
                 });
@@ -8967,12 +8973,24 @@
 
         function deprefParseISODate(str) {
             if (!str || typeof str !== 'string') return null;
-            const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(str.trim());
-            if (!m) return null;
-            const y = parseInt(m[1], 10), mo = parseInt(m[2], 10), d = parseInt(m[3], 10);
-            const dt = new Date(y, mo - 1, d);
-            if (dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return null;
-            return dt;
+            const s = str.trim();
+            const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+            if (iso) {
+                const y = parseInt(iso[1], 10), mo = parseInt(iso[2], 10), d = parseInt(iso[3], 10);
+                const dt = new Date(y, mo - 1, d);
+                if (dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return null;
+                return dt;
+            }
+            const parts = parseBuildCompleteRocDate(s);
+            return rocPartsToGregorianDate(parts);
+        }
+
+        function normalizeDeprefRocDateInput(el) {
+            if (!el) return;
+            const p = parseBuildCompleteRocDate(el.value);
+            if (p) {
+                el.value = p.y + '/' + String(p.m).padStart(2, '0') + '/' + String(p.d).padStart(2, '0');
+            }
         }
 
         function deprefDateOnlyLocal(d) {
@@ -8981,7 +8999,10 @@
 
         function deprefFormatDateTW(d) {
             if (!(d instanceof Date) || isNaN(d.getTime())) return '';
-            return d.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' });
+            const rocY = d.getFullYear() - 1911;
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return rocY + '/' + m + '/' + day;
         }
 
         /** 告知解約日 + 1 曆法月 − 1 日：實際解約日須 ≥ 此日才免扣一個月違約金（早於此日則扣） */
