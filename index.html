@@ -8979,10 +8979,11 @@
                 const y = parseInt(iso[1], 10), mo = parseInt(iso[2], 10), d = parseInt(iso[3], 10);
                 const dt = new Date(y, mo - 1, d);
                 if (dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return null;
-                return dt;
+                return deprefDateOnlyLocal(dt);
             }
             const parts = parseBuildCompleteRocDate(s);
-            return rocPartsToGregorianDate(parts);
+            const dt = rocPartsToGregorianDate(parts);
+            return dt ? deprefDateOnlyLocal(dt) : null;
         }
 
         function normalizeDeprefRocDateInput(el) {
@@ -9000,9 +9001,7 @@
         function deprefFormatDateTW(d) {
             if (!(d instanceof Date) || isNaN(d.getTime())) return '';
             const rocY = d.getFullYear() - 1911;
-            const m = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            return rocY + '/' + m + '/' + day;
+            return rocY + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
         }
 
         /** 告知解約日 + 1 曆法月 − 1 日：實際解約日須 ≥ 此日才免扣一個月違約金（早於此日則扣） */
