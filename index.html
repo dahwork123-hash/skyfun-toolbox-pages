@@ -9222,6 +9222,48 @@
             return !!(el && el.value === '1');
         }
 
+        /** 欠繳與溢繳互斥：已填首次欠繳日時不可選「有溢繳」 */
+        function deprefSyncArrearsOverpayControls(prefix) {
+            const missedEl = document.getElementById(prefix + 'first-missed-due-date');
+            const yesEl = document.getElementById(prefix + 'overpay-yes');
+            const noEl = document.getElementById(prefix + 'overpay-no');
+            const hasMissed = !!(missedEl?.value?.trim());
+            if (yesEl) yesEl.disabled = hasMissed;
+            if (hasMissed && yesEl?.checked && noEl) noEl.checked = true;
+        }
+
+        /** 試算結果互斥：欠繳與溢繳不可同時併入淨額 */
+        function deprefResolveArrearsOverpayExclusion(opts) {
+            const billingAmount = Math.round(Number(opts.billingAmount) || 0);
+            const mgmtArrears = Math.round(Number(opts.mgmtArrears) || 0);
+            const totalArrears = billingAmount + mgmtArrears;
+            const ovEnabled = !!opts.ovEnabled;
+            const autoOverpay = ovEnabled ? Math.round(Number(opts.autoOverpay) || 0) : 0;
+            const manualOverpay = ovEnabled ? Math.round(Number(opts.manualOverpay) || 0) : 0;
+            const mgmtOverpay = ovEnabled ? Math.round(Number(opts.mgmtOverpay) || 0) : 0;
+            const totalOverpay = autoOverpay + manualOverpay + mgmtOverpay;
+            const firstMissedStr = opts.firstMissedStr || '';
+            const base = { billingAmount, mgmtArrears, autoOverpay, manualOverpay, mgmtOverpay, arrearsNote: '', overpayNote: '', suppressed: null };
+            if (totalArrears <= 0 || totalOverpay <= 0) return base;
+            if (firstMissedStr) {
+                return {
+                    ...base,
+                    autoOverpay: 0,
+                    manualOverpay: 0,
+                    mgmtOverpay: 0,
+                    overpayNote: '已試算欠繳，溢繳不併計（欠繳與溢繳不可同時）。',
+                    suppressed: 'overpay'
+                };
+            }
+            return {
+                ...base,
+                billingAmount: 0,
+                mgmtArrears: 0,
+                arrearsNote: '已試算溢繳，欠繳不併計（欠繳與溢繳不可同時）。',
+                suppressed: 'arrears'
+            };
+        }
+
         /** 依西曆年月回傳該月天數（1–12 月，含閏年 2 月 29 天） */
         function deprefCalendarDaysFromYM(ym) {
             if (!ym || typeof ym !== 'string' || !/^\d{4}-\d{2}$/.test(ym.trim())) return null;
@@ -9391,17 +9433,44 @@
 
             const noticePenalty = deprefComputeNoticePenalty(rent, noticeStr, exitFullStr);
             const billing = deprefComputeBillingArrears(rentBillingOverpay, firstMissedStr, exitFullStr, prefix);
+            deprefSyncArrearsOverpayControls(prefix);
             const ovEnabled = deprefIsOverpayEnabled(prefix);
             const mgmtAmt = deprefComputeMgmtFeeAmounts(mgmtFeeMonthly, prefix, ovEnabled, firstMissedStr, exitFullStr);
-            let mgmtOverpay = mgmtAmt.overpay;
-            const mgmtArrears = mgmtAmt.arrears;
 
-            const rentArrearsLines = (billing.lines || []).map((seg, i) =>
-                deprefProrateLineLabel(isLandlordBao ? '租金欠繳（實匯房東）' : '租金欠繳', seg, i + 1)
-            );
-            const mgmtArrearsLines = (mgmtAmt.arrearsLines || []).map((seg, i) =>
-                deprefProrateLineLabel('管理費欠繳', seg, rentArrearsLines.length + i + 1)
-            );
+            let ovd = deprefComputeOverpayDetail(rentBillingOverpay, prefix);
+            if (isLandlordBao && ovEnabled) {
+                const baoRefund = baorefComputeOverpayRefund(rent, mgmtFeeMonthly, rentBillingOverpay, ovd);
+                ovd = { ...ovd, overpay: baoRefund.overpay, used: baoRefund.used };
+            }
+            let mgmtOverpay = isLandlordBao && ovEnabled ? 0 : mgmtAmt.overpay;
+            const rawAutoOverpay = ovEnabled ? ovd.overpay : 0;
+            const rawManualOverpay = ovEnabled ? deprefParseMoney(prefix + 'overpay-manual') : 0;
+            const ex = deprefResolveArrearsOverpayExclusion({
+                firstMissedStr,
+                ovEnabled,
+                billingAmount: billing.amount,
+                mgmtArrears: mgmtAmt.arrears,
+                autoOverpay: rawAutoOverpay,
+                manualOverpay: rawManualOverpay,
+                mgmtOverpay
+            });
+            const billingArrears = ex.billingAmount;
+            const mgmtArrears = ex.mgmtArrears;
+            const autoOverpay = ex.autoOverpay;
+            const manualOverpay = ex.manualOverpay;
+            mgmtOverpay = ex.mgmtOverpay;
+            const overpayEnabledFinal = ovEnabled && ex.suppressed !== 'overpay';
+
+            const rentArrearsLines = billingArrears > 0
+                ? (billing.lines || []).map((seg, i) =>
+                    deprefProrateLineLabel(isLandlordBao ? '租金欠繳（實匯房東）' : '租金欠繳', seg, i + 1)
+                )
+                : [];
+            const mgmtArrearsLines = mgmtArrears > 0
+                ? (mgmtAmt.arrearsLines || []).map((seg, i) =>
+                    deprefProrateLineLabel('管理費欠繳', seg, rentArrearsLines.length + i + 1)
+                )
+                : [];
             deprefRenderCalcDetailList(document.getElementById(prefix + 'billing-arrears-detail'), rentArrearsLines.concat(mgmtArrearsLines));
 
             const hintNotice = document.getElementById(prefix + 'notice-rule-hint');
@@ -9419,12 +9488,20 @@
 
             const sumBill = document.getElementById(prefix + 'billing-arrears-summary');
             if (sumBill) {
-                let billText = billing.summary || '';
-                if (isLandlordBao && withholdAdj.note) {
+                let billText = billingArrears > 0 || mgmtArrears > 0 ? (billing.summary || '') : '';
+                if (ex.suppressed === 'arrears') {
+                    billText = ex.arrearsNote;
+                } else if (billingArrears <= 0 && mgmtArrears <= 0 && firstMissedStr && billing.summary) {
+                    billText = billing.summary;
+                }
+                if (isLandlordBao && withholdAdj.note && billingArrears > 0) {
                     billText = billText ? billText + ' ' + withholdAdj.note : withholdAdj.note;
                 }
                 if (mgmtArrears > 0) {
                     billText = (billText ? billText + ' ' : '') + '管理費欠繳試算（與租金同繳、同比例）：' + mgmtArrears.toLocaleString('zh-TW') + ' 元（已併入③欠租列）。';
+                }
+                if (ex.suppressed === 'overpay' && ex.overpayNote && (billingArrears > 0 || mgmtArrears > 0)) {
+                    billText = (billText ? billText + ' ' : '') + ex.overpayNote;
                 }
                 sumBill.textContent = billText;
             }
@@ -9439,29 +9516,21 @@
                 }
             }
 
-            const arrearsTotal = billing.amount + mgmtArrears + noticePenalty + arrearsLate;
-            let ovd = deprefComputeOverpayDetail(rentBillingOverpay, prefix);
-            if (isLandlordBao && ovEnabled) {
-                const baoRefund = baorefComputeOverpayRefund(rent, mgmtFeeMonthly, rentBillingOverpay, ovd);
-                ovd = { ...ovd, overpay: baoRefund.overpay, used: baoRefund.used };
-                mgmtOverpay = 0;
-            }
+            const arrearsTotal = billingArrears + mgmtArrears + noticePenalty + arrearsLate;
             const manualEl = document.getElementById(prefix + 'overpay-manual');
             if (manualEl) {
-                manualEl.disabled = !ovEnabled;
-                if (!ovEnabled) manualEl.value = '';
+                manualEl.disabled = !overpayEnabledFinal;
+                if (!overpayEnabledFinal) manualEl.value = '';
             }
-            const autoOverpay = ovEnabled ? ovd.overpay : 0;
-            const manualOverpay = ovEnabled ? deprefParseMoney(prefix + 'overpay-manual') : 0;
             const overpay = Math.round(autoOverpay + manualOverpay + mgmtOverpay);
 
             const usedEl = document.getElementById(prefix + 'overpay-display-used');
             const refEl = document.getElementById(prefix + 'overpay-display-refund');
-            if (usedEl) usedEl.textContent = formatNT(ovd.used);
-            if (refEl) refEl.textContent = formatNT(autoOverpay + mgmtOverpay);
+            if (usedEl) usedEl.textContent = formatNT(overpayEnabledFinal ? ovd.used : 0);
+            if (refEl) refEl.textContent = formatNT(overpayEnabledFinal ? autoOverpay + mgmtOverpay : 0);
 
             let overpayDetailLines = [];
-            if (ovEnabled) {
+            if (overpayEnabledFinal) {
                 if (isLandlordBao && ovd.ready && ovd.cycleDays > 0) {
                     if (ovd.usedDays > 0) {
                         const netDaily = rentBillingOverpay / ovd.cycleDays;
@@ -9491,10 +9560,16 @@
 
             const hintOv = document.getElementById(prefix + 'overpay-hint');
             if (hintOv) {
-                if (!Number.isFinite(rent) || rent <= 0) {
+                const missedEl = document.getElementById(prefix + 'first-missed-due-date');
+                const hasMissed = !!(missedEl?.value?.trim());
+                if (hasMissed) {
+                    hintOv.textContent = '已填「首次欠繳之繳租日」，本件以欠繳試算為準，不可同時試算溢繳。';
+                } else if (!Number.isFinite(rent) || rent <= 0) {
                     hintOv.textContent = '';
                 } else if (!deprefIsOverpayEnabled(prefix)) {
                     hintOv.textContent = '';
+                } else if (ex.overpayNote) {
+                    hintOv.textContent = ex.overpayNote;
                 } else if (ovd.missing === 'exit') {
                     hintOv.textContent = '請填最上方「實際解約日」，溢繳試算才會計算。';
                 } else if (ovd.missing === 'md') {
@@ -9536,7 +9611,7 @@
             setEl('out-util', utilSum);
             setEl('out-other', otherSum);
             setEl('out-penalty-notice', noticePenalty);
-            setEl('out-arrears-billing', billing.amount + mgmtArrears);
+            setEl('out-arrears-billing', billingArrears + mgmtArrears);
             setEl('out-mgmt-fee', mgmtOverpay);
             setEl('out-deduct-total', deductTotal);
             setEl('out-deposit-balance', depositBalance);
