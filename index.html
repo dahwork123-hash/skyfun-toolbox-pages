@@ -5889,7 +5889,7 @@
                     <div class="font-extrabold text-purple-950 text-lg">試算結果</div>
                     <div class="rounded-xl border border-purple-200 bg-white/95 p-4 space-y-2">
                         <div class="text-sm font-bold text-purple-950">金額試算明細</div>
-                        <p class="text-xs text-slate-500 leading-relaxed">凡有依日租金或比例計算者，逐筆列出「帳期、元/天 × 天數 ＝ 金額」，方便與房客／房東核對。</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">凡有依日租金或比例計算者，逐筆列出「租期、元/天 × 天數 ＝ 金額」，方便與房客／房東核對。</p>
                         <ul id="depref-calc-detail-all" class="space-y-0"></ul>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -6146,7 +6146,7 @@
                     <div class="font-extrabold text-purple-950 text-lg">試算結果</div>
                     <div class="rounded-xl border border-purple-200 bg-white/95 p-4 space-y-2">
                         <div class="text-sm font-bold text-purple-950">金額試算明細</div>
-                        <p class="text-xs text-slate-500 leading-relaxed">凡有依日租金或比例計算者，逐筆列出「帳期、元/天 × 天數 ＝ 金額」，方便與房東核對。</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">凡有依日租金或比例計算者，逐筆列出「租期、元/天 × 天數 ＝ 金額」，方便與房東核對。</p>
                         <ul id="baoref-calc-detail-all" class="space-y-0"></ul>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -8837,11 +8837,12 @@
             return r.toLocaleString('zh-TW', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
         }
 
-        function deprefProrateLineLabel(kind, seg) {
+        function deprefProrateLineLabel(kind, seg, index) {
             const amt = Math.round(seg.amount);
             const period = seg.cycleLabel || seg.overlapLabel || '';
-            const periodNote = period ? `帳期 ${period}，` : '';
-            return `${kind}｜${periodNote}${deprefFmtDaily(seg.dailyRent)} 元/天 × ${seg.days} 天 ＝ ${amt.toLocaleString('zh-TW')} 元`;
+            const periodNote = period ? `租期 ${period}，` : '';
+            const prefix = Number.isFinite(index) ? `${index}. ` : '';
+            return `${prefix}${kind}｜${periodNote}${deprefFmtDaily(seg.dailyRent)} 元/天 × ${seg.days} 天 ＝ ${amt.toLocaleString('zh-TW')} 元`;
         }
 
         function deprefRenderCalcDetailList(el, items) {
@@ -9380,10 +9381,12 @@
             let mgmtOverpay = mgmtAmt.overpay;
             const mgmtArrears = mgmtAmt.arrears;
 
-            const rentArrearsLines = (billing.lines || []).map((seg) =>
-                deprefProrateLineLabel(isLandlordBao ? '③ 租金欠繳（實匯房東）' : '③ 租金欠繳', seg)
+            const rentArrearsLines = (billing.lines || []).map((seg, i) =>
+                deprefProrateLineLabel(isLandlordBao ? '租金欠繳（實匯房東）' : '租金欠繳', seg, i + 1)
             );
-            const mgmtArrearsLines = (mgmtAmt.arrearsLines || []).map((seg) => deprefProrateLineLabel('③ 管理費欠繳', seg));
+            const mgmtArrearsLines = (mgmtAmt.arrearsLines || []).map((seg, i) =>
+                deprefProrateLineLabel('管理費欠繳', seg, rentArrearsLines.length + i + 1)
+            );
             deprefRenderCalcDetailList(document.getElementById(prefix + 'billing-arrears-detail'), rentArrearsLines.concat(mgmtArrearsLines));
 
             const hintNotice = document.getElementById(prefix + 'notice-rule-hint');
