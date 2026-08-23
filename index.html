@@ -5889,7 +5889,7 @@
                     <div class="font-extrabold text-purple-950 text-lg">試算結果</div>
                     <div class="rounded-xl border border-purple-200 bg-white/95 p-4 space-y-2">
                         <div class="text-sm font-bold text-purple-950">金額試算明細</div>
-                        <p class="text-xs text-slate-500 leading-relaxed">凡有依日租金或比例計算者，逐筆列出「租期、元/天 × 天數（起迄日）＝ 金額」，方便與房客／房東核對。</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">凡有依日租金或比例計算者，逐筆列出「租期、元/天 × 天數（不足整月者附起迄日）＝ 金額」，方便與房客／房東核對。</p>
                         <ul id="depref-calc-detail-all" class="space-y-0"></ul>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -6146,7 +6146,7 @@
                     <div class="font-extrabold text-purple-950 text-lg">試算結果</div>
                     <div class="rounded-xl border border-purple-200 bg-white/95 p-4 space-y-2">
                         <div class="text-sm font-bold text-purple-950">金額試算明細</div>
-                        <p class="text-xs text-slate-500 leading-relaxed">凡有依日租金或比例計算者，逐筆列出「租期、元/天 × 天數（起迄日）＝ 金額」，方便與房東核對。</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">凡有依日租金或比例計算者，逐筆列出「租期、元/天 × 天數（不足整月者附起迄日）＝ 金額」，方便與房東核對。</p>
                         <ul id="baoref-calc-detail-all" class="space-y-0"></ul>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -8842,7 +8842,8 @@
             const period = seg.cycleLabel || '';
             const periodNote = period ? `租期 ${period}，` : '';
             const overlap = seg.overlapLabel || '';
-            const daysPart = overlap
+            const isPartial = overlap && Number(seg.days) < Number(seg.cycleDays || seg.days);
+            const daysPart = isPartial
                 ? `${deprefFmtDaily(seg.dailyRent)} 元/天 × ${seg.days} 天（${overlap}）`
                 : `${deprefFmtDaily(seg.dailyRent)} 元/天 × ${seg.days} 天`;
             const prefix = Number.isFinite(index) ? `${index}. ` : '';
