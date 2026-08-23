@@ -1017,10 +1017,28 @@
         $('btn-lal-apply-tpl')?.addEventListener('click', () => applyLetterTemplate(false));
     }
 
+    function applyArrearsPrefill() {
+        try {
+            const raw = sessionStorage.getItem('skyfun_arrears_prefill');
+            if (!raw) return;
+            const p = JSON.parse(raw);
+            if (p.type !== 'letter') return;
+            const list = partyListEl('receiver');
+            if (list && !list.querySelector('[data-lal-party]') && (p.tenant || p.address)) {
+                const card = createPartyCard('receiver', { name: p.tenant || '', addr: p.address || '' }, 1);
+                list.appendChild(card);
+            }
+            sessionStorage.removeItem('skyfun_arrears_prefill');
+            const st = $('lal-status');
+            if (st) st.textContent = '已自呆帳追蹤系統帶入收件人';
+        } catch { /* ignore */ }
+    }
+
     window.initLalGenerator = function () {
         bindLal();
         initLetterTemplateSelect();
         warnIfFileProtocol();
+        applyArrearsPrefill();
     };
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', window.initLalGenerator);

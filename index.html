@@ -8403,6 +8403,12 @@
             initLayoutMode();
             if (typeof window.initHomeSearch === 'function') window.initHomeSearch();
             initDisableNumberInputWheel();
+            try {
+                const page = new URLSearchParams(location.search).get('page');
+                if (page && typeof showPage === 'function') {
+                    setTimeout(() => showPage(page), 0);
+                }
+            } catch (e) { /* ignore */ }
 
             // 金句改顯示於登入頁，不再彈窗要求按按鈕
             try {

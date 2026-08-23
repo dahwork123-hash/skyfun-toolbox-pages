@@ -350,6 +350,19 @@
     });
   }
 
+  function applyArrearsPrefill() {
+    try {
+      const raw = sessionStorage.getItem('skyfun_arrears_prefill');
+      if (!raw) return;
+      const p = JSON.parse(raw);
+      if (p.type !== 'visit') return;
+      if ($('cvn-address') && p.address) $('cvn-address').value = p.address;
+      if ($('cvn-staff') && p.staff) $('cvn-staff').value = p.staff;
+      sessionStorage.removeItem('skyfun_arrears_prefill');
+      setStatus('已自呆帳追蹤系統帶入地址與聯絡人員');
+    } catch { /* ignore */ }
+  }
+
   function initCareVisitNotice() {
     if (!inited) {
       bindEvents();
@@ -359,6 +372,7 @@
     if ($('cvn-visit-y') && !$('cvn-visit-y').value) $('cvn-visit-y').value = String(t.y);
     if ($('cvn-visit-m') && !$('cvn-visit-m').value) $('cvn-visit-m').value = String(t.m);
     if ($('cvn-visit-d') && !$('cvn-visit-d').value) $('cvn-visit-d').value = String(t.day);
+    applyArrearsPrefill();
   }
 
   window.initCareVisitNotice = initCareVisitNotice;
