@@ -5889,7 +5889,7 @@
                     <div class="font-extrabold text-purple-950 text-lg">試算結果</div>
                     <div class="rounded-xl border border-purple-200 bg-white/95 p-4 space-y-2">
                         <div class="text-sm font-bold text-purple-950">金額試算明細</div>
-                        <p class="text-xs text-slate-500 leading-relaxed">凡有依日租金或比例計算者，逐筆列出「日租金 × 天數 ＝ 金額」，方便與房客／房東核對。</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">凡有依日租金或比例計算者，逐筆列出「帳期、元/天 × 天數 ＝ 金額」，方便與房客／房東核對。</p>
                         <ul id="depref-calc-detail-all" class="space-y-0"></ul>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -6146,7 +6146,7 @@
                     <div class="font-extrabold text-purple-950 text-lg">試算結果</div>
                     <div class="rounded-xl border border-purple-200 bg-white/95 p-4 space-y-2">
                         <div class="text-sm font-bold text-purple-950">金額試算明細</div>
-                        <p class="text-xs text-slate-500 leading-relaxed">凡有依日租金或比例計算者，逐筆列出「日租金 × 天數 ＝ 金額」，方便與房東核對。</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">凡有依日租金或比例計算者，逐筆列出「帳期、元/天 × 天數 ＝ 金額」，方便與房東核對。</p>
                         <ul id="baoref-calc-detail-all" class="space-y-0"></ul>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -8839,9 +8839,9 @@
 
         function deprefProrateLineLabel(kind, seg) {
             const amt = Math.round(seg.amount);
-            const cycleNote = seg.cycleLabel ? `帳期 ${seg.cycleLabel}，` : '';
-            const rangeNote = seg.overlapLabel ? `占用 ${seg.overlapLabel}：` : '';
-            return `${kind}｜${cycleNote}${rangeNote}日租金 ${deprefFmtDaily(seg.dailyRent)} 元 × ${seg.days} 天 ＝ ${amt.toLocaleString('zh-TW')} 元`;
+            const period = seg.cycleLabel || seg.overlapLabel || '';
+            const periodNote = period ? `帳期 ${period}，` : '';
+            return `${kind}｜${periodNote}${deprefFmtDaily(seg.dailyRent)} 元/天 × ${seg.days} 天 ＝ ${amt.toLocaleString('zh-TW')} 元`;
         }
 
         function deprefRenderCalcDetailList(el, items) {
@@ -9077,7 +9077,7 @@
             return deprefProrateByRentBillingCyclesDetail(rent, startInclusive, endInclusive, dueDay).total;
         }
 
-        /** 尾段依曆法月分段：各段 月租÷該曆法月天數×占用天數（未填起租日時帳期欠租之備援） */
+        /** 尾段依曆法月分段：各段 月租÷該曆法月天數×天數（未填起租日時帳期欠租之備援） */
         function deprefProratePartialByCalendarMonthsDetail(rent, start, endInclusive) {
             if (endInclusive < start) return { total: 0, lines: [] };
             let total = 0;
@@ -9157,7 +9157,7 @@
                 modeNote = '依「合約起租日之每月繳租日」界定每期（例：每月 5 號繳租＝該期當月 5 日～次月 4 日），日租金＝月租÷該期天數，再依與欠繳區間重疊天數累加。';
             } else {
                 prorateDetail = deprefProratePartialByCalendarMonthsDetail(rent, startD, exitD);
-                modeNote = '未填「合約起租日」或無法取得繳租日，暫依「曆法月」分段（月租÷該曆法月天數×當月占用天數）；補齊起租日後即改依繳租週期計算。';
+                modeNote = '未填「合約起租日」或無法取得繳租日，暫依「曆法月」分段（月租÷該曆法月天數×天數）；補齊起租日後即改依繳租週期計算。';
             }
             const amount = Math.round(prorateDetail.total);
             const summary = totalDays > 0
