@@ -177,6 +177,50 @@
         .toolbox-details[open] > summary .acc-chevron::before {
             content: '−';
         }
+        .depref-date-wrap {
+            display: flex;
+            align-items: stretch;
+            width: 100%;
+            position: relative;
+        }
+        .depref-date-wrap .depref-date-roc {
+            flex: 1 1 auto;
+            min-width: 0;
+            border-top-right-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+        }
+        .depref-date-picker-btn {
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #e2e8f0;
+            border-left: 0;
+            background: #fff;
+            border-radius: 0 0.75rem 0.75rem 0;
+            padding: 0 0.75rem;
+            cursor: pointer;
+            color: #475569;
+        }
+        .depref-date-picker-btn:hover {
+            background: #eef2ff;
+            color: #4338ca;
+        }
+        .depref-date-wrap--rose .depref-date-picker-btn {
+            border-color: #fb7185;
+        }
+        .depref-date-wrap--rose .depref-date-picker-btn:hover {
+            background: #fff1f2;
+            color: #be123c;
+        }
+        .depref-date-picker {
+            position: absolute;
+            width: 0;
+            height: 0;
+            opacity: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
         .rentmgr-major-body {
             margin-top: 0.75rem;
         }
@@ -5728,7 +5772,7 @@
                                        class="depref-date-roc w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200" />
                             </div>
                         </div>
-                        <p class="text-[11px] text-slate-500">日期請填<strong>民國年</strong>，例：115/08/23（亦支援 1150615、西元 2026/08/23 自動換算）</p>
+                        <p class="text-[11px] text-slate-500">日期請填<strong>民國年</strong>，例：115/08/23；可手動輸入，或點右側<strong>日曆</strong>按鈕選取（選完自動換算民國年）</p>
                         <p id="depref-lease-rent-due-hint" class="text-[11px] text-indigo-900/90 font-semibold leading-relaxed"></p>
                         <p id="depref-notice-rule-hint" class="text-[11px] text-indigo-900 font-semibold leading-relaxed"></p>
                     </div>
@@ -5986,7 +6030,7 @@
                                        class="depref-date-roc w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200" />
                             </div>
                         </div>
-                        <p class="text-[11px] text-slate-500">日期請填<strong>民國年</strong>，例：115/08/23（亦支援 1150615、西元 2026/08/23 自動換算）</p>
+                        <p class="text-[11px] text-slate-500">日期請填<strong>民國年</strong>，例：115/08/23；可手動輸入，或點右側<strong>日曆</strong>按鈕選取（選完自動換算民國年）</p>
                         <p id="baoref-lease-rent-due-hint" class="text-[11px] text-indigo-900/90 font-semibold leading-relaxed"></p>
                         <p id="baoref-notice-rule-hint" class="text-[11px] text-indigo-900 font-semibold leading-relaxed"></p>
                     </div>
@@ -8753,6 +8797,7 @@
             function wireDepositRefundPage(pageId, prefix, party) {
                 const root = document.getElementById(pageId);
                 if (!root) return;
+                enhanceDeprefRocDatePickers(root);
                 const run = function () { updateDepositRefundCalcFor(prefix, party); };
                 root.querySelectorAll('.depref-in, .baoref-in').forEach(function (el) {
                     el.addEventListener('input', run);
@@ -9002,6 +9047,62 @@
             if (!(d instanceof Date) || isNaN(d.getTime())) return '';
             const rocY = d.getFullYear() - 1911;
             return rocY + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
+        }
+
+        function deprefDateToIsoValue(dt) {
+            if (!(dt instanceof Date) || isNaN(dt.getTime())) return '';
+            return dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+        }
+
+        function deprefSyncPickerFromRocText(textEl, picker) {
+            if (!textEl || !picker) return;
+            picker.value = deprefDateToIsoValue(deprefParseISODate(textEl.value));
+        }
+
+        function enhanceDeprefRocDatePickers(root) {
+            if (!root) return;
+            const calSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+            root.querySelectorAll('.depref-date-roc').forEach(function (textEl) {
+                if (textEl.dataset.pickerWired === '1') return;
+                textEl.dataset.pickerWired = '1';
+                const wrap = document.createElement('div');
+                wrap.className = 'depref-date-wrap' + (textEl.id.indexOf('first-missed') >= 0 ? ' depref-date-wrap--rose' : '');
+                textEl.parentNode.insertBefore(wrap, textEl);
+                wrap.appendChild(textEl);
+                const picker = document.createElement('input');
+                picker.type = 'date';
+                picker.className = 'depref-date-picker';
+                picker.setAttribute('aria-hidden', 'true');
+                picker.tabIndex = -1;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'depref-date-picker-btn';
+                btn.setAttribute('aria-label', '以日曆選日期');
+                btn.innerHTML = calSvg;
+                btn.addEventListener('click', function () {
+                    deprefSyncPickerFromRocText(textEl, picker);
+                    try {
+                        if (typeof picker.showPicker === 'function') picker.showPicker();
+                        else picker.click();
+                    } catch (err) {
+                        picker.click();
+                    }
+                });
+                picker.addEventListener('change', function () {
+                    if (!picker.value) return;
+                    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(picker.value);
+                    if (!m) return;
+                    const dt = new Date(+m[1], +m[2] - 1, +m[3]);
+                    textEl.value = deprefFormatDateTW(dt);
+                    textEl.dispatchEvent(new Event('input', { bubbles: true }));
+                    textEl.dispatchEvent(new Event('change', { bubbles: true }));
+                });
+                wrap.appendChild(btn);
+                wrap.appendChild(picker);
+                textEl.addEventListener('blur', function () {
+                    deprefSyncPickerFromRocText(textEl, picker);
+                });
+            });
         }
 
         /** 告知解約日 + 1 曆法月 − 1 日：實際解約日須 ≥ 此日才免扣一個月違約金（早於此日則扣） */
