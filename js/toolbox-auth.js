@@ -135,7 +135,7 @@
         <span class="lite-auth-quote-label">今日金句</span>
         <p id="quote-text-gate">${quote}</p>
       </blockquote>
-      <p id="toolbox-auth-mode-hint" class="lite-auth-hint">輸入帳號與密碼即可進入。新同事請先申請帳號。</p>
+      <p id="toolbox-auth-mode-hint" class="lite-auth-hint">輸入帳號與密碼即可進入。第一次登入請先註冊。</p>
       <label for="toolbox-auth-username">帳號</label>
       <input id="toolbox-auth-username" type="text" maxlength="40" autocomplete="username" placeholder="至少 3 碼" />
       <label for="toolbox-auth-password">密碼</label>
@@ -215,7 +215,7 @@
       hint.textContent =
         mode === 'register'
           ? '送出後需管理員核准，核准後再用同一組帳密進入。'
-          : '輸入帳號與密碼即可進入。新同事請先申請帳號。';
+          : '輸入帳號與密碼即可進入。第一次登入請先註冊。';
     }
     const tag = document.querySelector('.lite-auth-tag');
     if (tag) tag.textContent = mode === 'register' ? '申請帳號' : '帳號登入';
