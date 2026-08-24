@@ -10800,6 +10800,11 @@
 
             const maxPingHint = adjustedPrice > 0 ? Math.floor(rentEvalCap / adjustedPrice) : 0;
 
+            const manualEl = document.getElementById('rent-manual-input');
+            const manualRaw = manualEl && manualEl.value != null ? String(manualEl.value).trim() : '';
+            const manualNum = manualRaw === '' ? NaN : parseFloat(manualRaw);
+            const manualWithinCap = !Number.isNaN(manualNum) && manualNum > 0 && manualNum <= rentEvalCap;
+
             const capBanner = document.getElementById('rent-cap-banner');
             const capL1 = document.getElementById('rent-cap-banner-line1');
             const capL2 = document.getElementById('rent-cap-banner-line2');
@@ -10809,36 +10814,68 @@
             const heroSub = document.getElementById('rent-hero-sub');
 
             if (overTableCap) {
-                if (capBanner && capL1 && capL2 && capL3) {
+                if (manualWithinCap) {
+                    if (capBanner && capL1 && capL2 && capL3) {
+                        capBanner.classList.remove('hidden');
+                        capBanner.classList.remove('border-rose-600', 'bg-rose-50', 'border-amber-500', 'bg-amber-50');
+                        capBanner.classList.add('border-emerald-500', 'bg-emerald-50');
+                        const titleEl = capBanner.querySelector('p');
+                        if (titleEl) {
+                            titleEl.classList.remove('text-rose-900', 'text-amber-950');
+                            titleEl.classList.add('text-emerald-900');
+                            titleEl.textContent = '可收件／可加入社宅';
+                        }
+                        capL1.textContent = '房東開價 NT$ ' + manualNum.toLocaleString('zh-TW') + ' 未超過表一上限 NT$ ' + rentEvalCap.toLocaleString('zh-TW') + '（' + typeLabel + '）。';
+                        capL2.textContent = '評定參考值 NT$ ' + suggestedRent.toLocaleString('zh-TW') + ' 雖高於表一，但不影響收件；簽約月租以房東開價／表一上限內為準。';
+                        capL3.textContent = maxPingHint > 0
+                            ? '補充：若評定參考值也要壓在表一內，照現在單價坪數大約不要超過 ' + maxPingHint + ' 坪。（僅供試算參考）'
+                            : '';
+                    }
+                    if (heroLabel) {
+                        heroLabel.textContent = flex
+                            ? '評定參考值（月・彈性認定採「' + typeLabel + '」標準）'
+                            : '評定參考值（月）';
+                    }
+                    if (heroSub) {
+                        heroSub.classList.remove('text-rose-800', 'text-amber-900');
+                        heroSub.classList.add('text-emerald-800');
+                        heroSub.textContent = '表一收件上限：NT$ ' + rentEvalCap.toLocaleString('zh-TW') + '／月';
+                    }
+                    if (suggestedRentEl) {
+                        suggestedRentEl.textContent = 'NT$ ' + suggestedRent.toLocaleString('zh-TW');
+                        suggestedRentEl.classList.remove('text-amber-700', 'text-rose-600', 'text-sky-600');
+                        suggestedRentEl.classList.add('text-slate-500');
+                    }
+                } else if (capBanner && capL1 && capL2 && capL3) {
                     capBanner.classList.remove('hidden');
-                    capBanner.classList.remove('border-rose-600', 'bg-rose-50');
+                    capBanner.classList.remove('border-rose-600', 'bg-rose-50', 'border-emerald-500', 'bg-emerald-50');
                     capBanner.classList.add('border-amber-500', 'bg-amber-50');
                     const titleEl = capBanner.querySelector('p');
                     if (titleEl) {
-                        titleEl.classList.remove('text-rose-900');
+                        titleEl.classList.remove('text-rose-900', 'text-emerald-900');
                         titleEl.classList.add('text-amber-950');
-                        titleEl.textContent = '注意：評定金額超過表一上限（仍可能可收件）';
+                        titleEl.textContent = '注意：評定參考值超過表一上限';
                     }
                     capL1.textContent = '這一縣市、' + typeLabel + '，表一收件上限為 NT$ ' + rentEvalCap.toLocaleString('zh-TW') + '／月。';
-                    capL2.textContent = '這次評定算出 NT$ ' + suggestedRent.toLocaleString('zh-TW') + '，已超過表一；實際簽約／收件月租最高只能到 NT$ ' + rentEvalCap.toLocaleString('zh-TW') + '。若房東預期租金 ≤ 此上限，仍可收件。';
+                    capL2.textContent = '這次評定參考值 NT$ ' + suggestedRent.toLocaleString('zh-TW') + ' 已超過表一；實際簽約／收件月租最高只能到 NT$ ' + rentEvalCap.toLocaleString('zh-TW') + '。若房東預期租金 ≤ 此上限，仍可收件。';
                     capL3.textContent = maxPingHint > 0
-                        ? '補充：若要以評定金額本身不超過表一，照現在單價坪數大約不要超過 ' + maxPingHint + ' 坪。（僅供試算參考）'
-                        : '補充：可改屋齡／裝修／區位再試算。（僅供試算參考）';
-                }
-                if (heroLabel) {
-                    heroLabel.textContent = flex
-                        ? '評定結果（月・彈性認定採「' + typeLabel + '」標準）'
-                        : '評定結果（月）';
-                }
-                if (heroSub) {
-                    heroSub.classList.remove('text-rose-800');
-                    heroSub.classList.add('text-amber-900');
-                    heroSub.textContent = '可收件／簽約上限：NT$ ' + rentEvalCap.toLocaleString('zh-TW') + '／月（表一）';
-                }
-                if (suggestedRentEl) {
-                    suggestedRentEl.textContent = 'NT$ ' + suggestedRent.toLocaleString('zh-TW');
-                    suggestedRentEl.classList.remove('text-sky-600');
-                    suggestedRentEl.classList.add('text-amber-700');
+                        ? '補充：若要以評定參考值本身不超過表一，照現在單價坪數大約不要超過 ' + maxPingHint + ' 坪。（僅供試算參考）'
+                        : '補充：可改屋齡／裝修／區位再試算，或填寫房東預期租金確認是否可收件。（僅供試算參考）';
+                    if (heroLabel) {
+                        heroLabel.textContent = flex
+                            ? '評定參考值（月・彈性認定採「' + typeLabel + '」標準）'
+                            : '評定參考值（月）';
+                    }
+                    if (heroSub) {
+                        heroSub.classList.remove('text-rose-800', 'text-emerald-800');
+                        heroSub.classList.add('text-amber-900');
+                        heroSub.textContent = '可收件／簽約上限：NT$ ' + rentEvalCap.toLocaleString('zh-TW') + '／月（表一）';
+                    }
+                    if (suggestedRentEl) {
+                        suggestedRentEl.textContent = 'NT$ ' + suggestedRent.toLocaleString('zh-TW');
+                        suggestedRentEl.classList.remove('text-sky-600', 'text-emerald-800');
+                        suggestedRentEl.classList.add('text-amber-700');
+                    }
                 }
             } else {
                 if (capBanner) {
@@ -10894,13 +10931,14 @@
             }
             document.getElementById('final-rent').textContent = 'NT$ ' + suggestedRent.toLocaleString();
 
-            const manualEl = document.getElementById('rent-manual-input');
             const manualPanel = document.getElementById('rent-manual-panel');
             const manualBody = document.getElementById('rent-manual-panel-body');
-            const manualRaw = manualEl && manualEl.value != null ? String(manualEl.value).trim() : '';
-            const manualNum = manualRaw === '' ? NaN : parseFloat(manualRaw);
             if (manualPanel && manualBody) {
                 if (!Number.isNaN(manualNum) && manualNum > 0) {
+                    if (overTableCap && manualWithinCap) {
+                        manualPanel.classList.add('hidden');
+                        manualBody.innerHTML = '';
+                    } else {
                     manualPanel.classList.remove('hidden');
                     const big = 'rounded-2xl border-4 px-5 py-6 md:px-8 md:py-8 text-center text-xl md:text-2xl font-black leading-snug shadow-lg';
                     let html = '';
@@ -10909,11 +10947,12 @@
                     } else if (manualNum > suggestedRent) {
                         html = '<div class="' + big + ' border-rose-500 bg-rose-100 text-rose-950">房東預期租金超過評定金額，無法加入社宅</div>';
                     } else if (overTableCap) {
-                        html = '<div class="' + big + ' border-emerald-500 bg-emerald-100 text-emerald-950">房東預期租金未超過表一上限 NT$ ' + rentEvalCap.toLocaleString('zh-TW') + '，可收件／可加入社宅<br><span class="block mt-2 text-base md:text-lg font-bold text-emerald-900/90">（評定算出 NT$ ' + suggestedRent.toLocaleString('zh-TW') + '，簽約月租請以表一上限內為準）</span></div>';
+                        html = '<div class="' + big + ' border-emerald-500 bg-emerald-100 text-emerald-950">房東預期租金未超過表一上限 NT$ ' + rentEvalCap.toLocaleString('zh-TW') + '，可收件／可加入社宅<br><span class="block mt-2 text-base md:text-lg font-bold text-emerald-900/90">（評定參考值 NT$ ' + suggestedRent.toLocaleString('zh-TW') + '，簽約月租請以表一上限內為準）</span></div>';
                     } else {
                         html = '<div class="' + big + ' border-emerald-500 bg-emerald-100 text-emerald-950">房東預期租金低於評定結果，可加入社宅</div>';
                     }
                     manualBody.innerHTML = html;
+                    }
                 } else {
                     manualPanel.classList.add('hidden');
                     manualBody.innerHTML = '';
