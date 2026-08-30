@@ -2562,6 +2562,40 @@
             border-color: rgba(251, 191, 36, 0.45);
             letter-spacing: 0.1em;
         }
+        .app-weekly-meeting-link {
+            position: absolute;
+            top: 0.65rem;
+            left: 0.65rem;
+            z-index: 30;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.45rem 0.9rem;
+            border-radius: 9999px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            color: #4338ca;
+            background: rgba(238, 242, 255, 0.96);
+            border: 1px solid rgba(199, 210, 254, 0.95);
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.14);
+            transition: background-color 160ms ease, border-color 160ms ease, transform 120ms ease, box-shadow 160ms ease;
+        }
+        .app-weekly-meeting-link:hover {
+            background: #eef2ff;
+            border-color: #a5b4fc;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.18);
+        }
+        body.is-subpage .app-weekly-meeting-link { display: none; }
+        @media (min-width: 640px) {
+            .app-weekly-meeting-link {
+                top: 0.85rem;
+                left: 1rem;
+                font-size: 0.82rem;
+                padding: 0.5rem 1rem;
+            }
+        }
         .app-main-title {
             font-weight: 700;
             letter-spacing: 0.02em;
@@ -3151,6 +3185,8 @@
             </div>
         </div>
         <div class="relative z-10">
+
+        <a id="home-weekly-meeting-link" href="./docs/weekly-meeting/" class="app-weekly-meeting-link no-underline" title="管理部週會簡報與表單下載">📂 業務周會</a>
 
         <!-- 首頁標題區 -->
         <header class="app-hero">
