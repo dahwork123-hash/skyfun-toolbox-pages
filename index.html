@@ -2759,6 +2759,60 @@
             --ext-accent-soft: #f1f5f9;
             --ext-accent-border: rgba(100, 116, 139, 0.22);
         }
+        .weekly-meeting-teaser {
+            max-width: 42rem;
+            margin: 0 auto 2rem;
+            padding: 0 0.5rem;
+        }
+        .weekly-meeting-teaser__link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.15rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(99, 102, 241, 0.22);
+            background: linear-gradient(135deg, #ffffff 0%, #eef2ff 100%);
+            box-shadow: 0 10px 28px rgba(99, 102, 241, 0.08);
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+        .weekly-meeting-teaser__link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 32px rgba(99, 102, 241, 0.14);
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+        .weekly-meeting-teaser__icon {
+            flex-shrink: 0;
+            width: 2.75rem;
+            height: 2.75rem;
+            display: grid;
+            place-items: center;
+            border-radius: 0.85rem;
+            background: #6366f1;
+            color: #fff;
+            font-size: 1.35rem;
+        }
+        .weekly-meeting-teaser__body { flex: 1; min-width: 0; }
+        .weekly-meeting-teaser__title {
+            margin: 0;
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #312e81;
+        }
+        .weekly-meeting-teaser__desc {
+            margin: 0.2rem 0 0;
+            font-size: 0.82rem;
+            color: var(--ink-muted);
+            line-height: 1.5;
+        }
+        .weekly-meeting-teaser__arrow {
+            flex-shrink: 0;
+            font-size: 1.25rem;
+            color: #6366f1;
+            font-weight: 700;
+        }
         .ext-links__heading {
             margin: 0 0 1rem;
             padding: 0 0.25rem;
@@ -3201,6 +3255,17 @@
             <p class="home-search-hint">支援多關鍵字與同義詞（如「任務板／業績」）；點選框內可看熱門功能</p>
         </div>
 
+        <section id="weekly-meeting-teaser" class="weekly-meeting-teaser" aria-label="業務周會檔案">
+            <a href="./docs/weekly-meeting/" class="weekly-meeting-teaser__link">
+                <span class="weekly-meeting-teaser__icon" aria-hidden="true">📂</span>
+                <span class="weekly-meeting-teaser__body">
+                    <p class="weekly-meeting-teaser__title">業務周會檔案</p>
+                    <p class="weekly-meeting-teaser__desc">週會簡報依日期下載 · 含領款收據等表單 · 每週更新</p>
+                </span>
+                <span class="weekly-meeting-teaser__arrow" aria-hidden="true">→</span>
+            </a>
+        </section>
+
         <nav id="layout-header-links" class="ext-links layout-header-links max-w-6xl mx-auto mb-10 md:mb-12 px-2 md:px-1" aria-label="常用外部系統與查詢捷徑">
             <p class="ext-links__heading">常用外部系統 · 一鍵開啟</p>
             <div class="ext-links__grid">
@@ -3210,6 +3275,13 @@
                         <h2 class="ext-link-card__title">公司 · 工具</h2>
                     </header>
                     <ul class="ext-link-list">
+                        <li>
+                            <a href="./docs/weekly-meeting/" class="ext-link-item no-underline">
+                                <span class="ext-link-item__emoji" aria-hidden="true">📂</span>
+                                <span class="ext-link-item__label">業務周會檔案</span>
+                                <span class="ext-link-item__arrow" aria-hidden="true">→</span>
+                            </a>
+                        </li>
                         <li>
                             <a href="https://skyfunsystem.com/Home/Login" target="_blank" rel="noopener noreferrer" class="ext-link-item no-underline">
                                 <span class="ext-link-item__emoji" aria-hidden="true">🔐</span>
@@ -9862,6 +9934,7 @@
         }
 
         window.SITE_SEARCH_INDEX = [
+            { file: './docs/weekly-meeting/', title: '業務周會檔案', category: '首頁專區', keywords: '周會 週會 簡報 業務周會 管理部 下載 領款收據' },
             { page: 'landlord', title: '房東專區', category: '首頁專區', keywords: '房東 出租 業主 房東客' },
             { page: 'calculator', title: '房東稅務試算表', category: '房東專區', keywords: '稅務試算 稅 所得 二代健保 預扣 綜所稅 社宅優惠 四種租賃' },
             { page: 'landlord-house-tax', title: '房屋稅課稅級距', category: '房東專區', keywords: '房屋稅 級距 自用 非自用 課稅' },
@@ -10051,6 +10124,7 @@
 
             setPageHidden('home-menu', true);
             setPageHidden('layout-header-links', true);
+            setPageHidden('weekly-meeting-teaser', true);
             setPageHidden('nb-readings-library', true);
             ALL_PAGE_ELEMENT_IDS.forEach((id) => setPageHidden(id, true));
 
@@ -10058,6 +10132,7 @@
                 setPageHidden('home-menu', false);
                 setPageHidden('home-search-wrap', false);
                 setPageHidden('layout-header-links', false);
+                setPageHidden('weekly-meeting-teaser', false);
                 lastActivePageId = null;
                 lastActivePageName = 'home';
                 pageNavStack.length = 0;
@@ -10071,6 +10146,7 @@
                 setPageHidden('home-menu', false);
                 setPageHidden('home-search-wrap', false);
                 setPageHidden('layout-header-links', false);
+                setPageHidden('weekly-meeting-teaser', false);
                 lastActivePageName = 'home';
                 pageNavStack.length = 0;
                 updateAppChrome('home');

@@ -5,6 +5,10 @@
     'use strict';
 
     window.SITE_FILE_SEARCH_INDEX = [
+        { file: './docs/weekly-meeting/files/2025-08-31_管理部週會.pdf', title: '115/08/31 管理部週會', category: '檔案 · PDF · 業務周會', keywords: '周會 週會 簡報 業務周會 管理部 0831' },
+        { file: './docs/weekly-meeting/files/2025-08-24_管理部週會_預審複審分工調整.pdf', title: '115/08/24 預審複審分工調整', category: '檔案 · PDF · 業務周會', keywords: '周會 週會 簡報 預審 複審 0907 0824' },
+        { file: './docs/weekly-meeting/files/領款收據_1150601版_星鴻.pdf', title: '領款收據 1150601版（星鴻）', category: '檔案 · PDF · 業務周會', keywords: '領款 收據 星鴻 周會 表單' },
+        { file: './docs/weekly-meeting/files/領款收據_1150601版_星華.pdf', title: '領款收據 1150601版（星華）', category: '檔案 · PDF · 業務周會', keywords: '領款 收據 星華 周會 表單' },
         { file: './01.場勘+招租1160210.docx', title: '01.場勘+招租1160210', category: '檔案 · DOCX · 租管師專區', keywords: '場勘 招租 範本 新人' },
         { file: './02.場勘+收資料1160303.docx', title: '02.場勘+收資料1160303', category: '檔案 · DOCX · 租管師專區', keywords: '場勘 收資料 範本 新人' },
         { file: './02-1.案件內容確認-續約件1150505.docx', title: '02-1.案件內容確認-續約件1150505', category: '檔案 · DOCX · 租管師專區', keywords: '續約 案件確認 範本' },
