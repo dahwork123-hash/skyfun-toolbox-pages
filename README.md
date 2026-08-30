@@ -5,10 +5,11 @@
 
 | 版本 | 網址 |
 |------|------|
-| **正式 GitHub Pages** | https://thinklover.github.io/skyfun-toolbox-pages/ |
+| **正式站（自訂網域）** | https://toolbox.skyfunsystem.com/ |
+| GitHub Pages 鏡像 | https://thinklover.github.io/skyfun-toolbox-pages/ |
 | Render 完整版 | https://skyfun-toolbox-api.onrender.com |
 
-> 舊網址 `dahwork123-hash.github.io/skyfun-toolbox-pages/` 已停用，不會隨 push 更新。
+> push 後需執行 `deploy-publish.ps1`（POST Cloud Build webhook），約 **4 分鐘** 後 `toolbox.skyfunsystem.com` 才會更新。若沒看到改動請 **Ctrl+F5** 強制重新整理。
 
 ## 更新並部署
 

@@ -29,4 +29,4 @@ try {
 
 Write-Host ''
 Write-Host 'Deploy triggered. Check email in ~4 min.'
-Write-Host 'Live site: https://thinklover.github.io/skyfun-toolbox-pages/'
+Write-Host 'Live site: https://toolbox.skyfunsystem.com/'
