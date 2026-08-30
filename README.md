@@ -5,16 +5,23 @@
 
 | 版本 | 網址 |
 |------|------|
-| GitHub Pages | https://dahwork123-hash.github.io/skyfun-toolbox-pages/ |
+| **正式 GitHub Pages** | https://thinklover.github.io/skyfun-toolbox-pages/ |
 | Render 完整版 | https://skyfun-toolbox-api.onrender.com |
 
-## 更新
+> 舊網址 `dahwork123-hash.github.io/skyfun-toolbox-pages/` 已停用，不會隨 push 更新。
+
+## 更新並部署
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\prepare-pages.ps1
+# 1. 複製 webhook 設定（只需第一次）
+copy scripts\deploy-webhook.url.example scripts\deploy-webhook.url
+# 編輯 deploy-webhook.url 填入 Cloud Build webhook 完整 URL
+
+# 2. 推送 + 觸發 Cloud Build（約 4 分鐘內收 Email）
+powershell -ExecutionPolicy Bypass -File .\scripts\deploy-publish.ps1
 ```
 
-再推送到 `skyfun-toolbox-pages` 公開倉庫。
+若只改靜態檔、已 push 過，也可手動 POST webhook（`Content-Type: application/json`、body `{}`）。
 
 ## 帳號流程
 
