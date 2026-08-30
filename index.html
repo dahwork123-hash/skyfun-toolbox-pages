@@ -3255,17 +3255,6 @@
             <p class="home-search-hint">支援多關鍵字與同義詞（如「任務板／業績」）；點選框內可看熱門功能</p>
         </div>
 
-        <section id="weekly-meeting-teaser" class="weekly-meeting-teaser" aria-label="業務周會檔案">
-            <a href="./docs/weekly-meeting/" class="weekly-meeting-teaser__link">
-                <span class="weekly-meeting-teaser__icon" aria-hidden="true">📂</span>
-                <span class="weekly-meeting-teaser__body">
-                    <p class="weekly-meeting-teaser__title">業務周會檔案</p>
-                    <p class="weekly-meeting-teaser__desc">週會簡報依日期下載 · 含領款收據等表單 · 每週更新</p>
-                </span>
-                <span class="weekly-meeting-teaser__arrow" aria-hidden="true">→</span>
-            </a>
-        </section>
-
         <nav id="layout-header-links" class="ext-links layout-header-links max-w-6xl mx-auto mb-10 md:mb-12 px-2 md:px-1" aria-label="常用外部系統與查詢捷徑">
             <p class="ext-links__heading">常用外部系統 · 一鍵開啟</p>
             <div class="ext-links__grid">
@@ -3275,13 +3264,6 @@
                         <h2 class="ext-link-card__title">公司 · 工具</h2>
                     </header>
                     <ul class="ext-link-list">
-                        <li>
-                            <a href="./docs/weekly-meeting/" class="ext-link-item no-underline">
-                                <span class="ext-link-item__emoji" aria-hidden="true">📂</span>
-                                <span class="ext-link-item__label">業務周會檔案</span>
-                                <span class="ext-link-item__arrow" aria-hidden="true">→</span>
-                            </a>
-                        </li>
                         <li>
                             <a href="https://skyfunsystem.com/Home/Login" target="_blank" rel="noopener noreferrer" class="ext-link-item no-underline">
                                 <span class="ext-link-item__emoji" aria-hidden="true">🔐</span>
@@ -3430,7 +3412,7 @@
                     <button onclick="showPage('business')" class="btn btn-block btn-center btn-xl tone-purple">
                         💼 業務專區
                     </button>
-                    <p class="text-slate-600 mt-3 text-center text-sm leading-relaxed">租金水準、公證費試算與各式表單；解約退還試算請至「催收解約專區」。</p>
+                    <p class="text-slate-600 mt-3 text-center text-sm leading-relaxed">租金水準、公證費、表單與周會檔案；解約退還試算請至「催收解約專區」。</p>
                 </div>
 
                 <div class="home-feature-card home-card-termination">
@@ -5350,8 +5332,8 @@
             </button>
             <div class="bg-gradient-to-br from-purple-50 via-white to-slate-50 rounded-[2rem] p-6 border border-purple-200 shadow-lg">
                 <h2 class="text-3xl font-bold text-slate-900 mb-2 text-center">💼 業務專區</h2>
-                <p class="text-slate-600 mb-4 text-center max-w-2xl mx-auto leading-relaxed">租金水準、公證費試算與各式表單等工具；解約退還金額試算請至首頁「催收解約專區」。</p>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <p class="text-slate-600 mb-4 text-center max-w-2xl mx-auto leading-relaxed">租金水準、公證費試算、各式表單與周會簡報下載；解約退還金額試算請至首頁「催收解約專區」。</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <button onclick="showPage('rent')" class="btn btn-block btn-center btn-solid-purple text-xl">
                         📈 前往租金水準試算器
                     </button>
@@ -5361,6 +5343,9 @@
                     <button onclick="showPage('business-forms')" class="btn btn-block btn-center btn-solid-purple text-xl">
                         📋 各式表單
                     </button>
+                    <a href="./docs/weekly-meeting/" class="btn btn-block btn-center btn-solid-purple text-xl no-underline">
+                        📂 業務周會檔案
+                    </a>
                 </div>
             </div>
         </div>
@@ -9934,6 +9919,7 @@
         }
 
         window.SITE_SEARCH_INDEX = [
+            { page: 'business', title: '業務周會檔案', category: '業務專區', keywords: '周會 週會 簡報 業務周會 管理部 下載 領款收據', file: './docs/weekly-meeting/' },
             { file: './docs/weekly-meeting/', title: '業務周會檔案', category: '首頁專區', keywords: '周會 週會 簡報 業務周會 管理部 下載 領款收據' },
             { page: 'landlord', title: '房東專區', category: '首頁專區', keywords: '房東 出租 業主 房東客' },
             { page: 'calculator', title: '房東稅務試算表', category: '房東專區', keywords: '稅務試算 稅 所得 二代健保 預扣 綜所稅 社宅優惠 四種租賃' },
@@ -10124,7 +10110,6 @@
 
             setPageHidden('home-menu', true);
             setPageHidden('layout-header-links', true);
-            setPageHidden('weekly-meeting-teaser', true);
             setPageHidden('nb-readings-library', true);
             ALL_PAGE_ELEMENT_IDS.forEach((id) => setPageHidden(id, true));
 
@@ -10132,7 +10117,6 @@
                 setPageHidden('home-menu', false);
                 setPageHidden('home-search-wrap', false);
                 setPageHidden('layout-header-links', false);
-                setPageHidden('weekly-meeting-teaser', false);
                 lastActivePageId = null;
                 lastActivePageName = 'home';
                 pageNavStack.length = 0;
@@ -10146,7 +10130,6 @@
                 setPageHidden('home-menu', false);
                 setPageHidden('home-search-wrap', false);
                 setPageHidden('layout-header-links', false);
-                setPageHidden('weekly-meeting-teaser', false);
                 lastActivePageName = 'home';
                 pageNavStack.length = 0;
                 updateAppChrome('home');
