@@ -115,6 +115,26 @@
     return DAILY_QUOTES[Math.floor(Math.random() * DAILY_QUOTES.length)];
   }
 
+  function escHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function populateDepartmentSelect(el, selected) {
+    if (!el) return;
+    if (typeof window.buildSkyfunDepartmentSelectHtml === 'function') {
+      el.innerHTML = window.buildSkyfunDepartmentSelectHtml(selected);
+      return;
+    }
+    const fallback = ['北一處', '北二處', '北三處', '基一處', '桃一處', '竹一處', '宜一處', '中一處', '中二處', '中三處', '中四處', '中五處', '中六處', '彰一處', '嘉一處', '南一處', '南二處', '高一處', '高二處', '行政管理部', '總經理室', '租賃管理部', '客服部', '客滿部', '財務部'];
+    const sel = String(selected || '').trim();
+    el.innerHTML = '<option value="">請選擇處別</option>' +
+      fallback.map((o) => `<option value="${escHtml(o)}"${o === sel ? ' selected' : ''}>${escHtml(o)}</option>`).join('');
+  }
+
   function rebuildGateForm() {
     const card = document.querySelector('#toolbox-auth-gate .toolbox-auth-card');
     if (!card) return;
@@ -145,6 +165,8 @@
         <input id="toolbox-auth-password2" type="password" maxlength="72" autocomplete="new-password" placeholder="再輸入一次" />
         <label for="toolbox-auth-displayname">姓名</label>
         <input id="toolbox-auth-displayname" type="text" maxlength="30" autocomplete="nickname" placeholder="請輸入姓名" required />
+        <label for="toolbox-auth-team">處別</label>
+        <select id="toolbox-auth-team" required>${typeof window.buildSkyfunDepartmentSelectHtml === 'function' ? window.buildSkyfunDepartmentSelectHtml() : '<option value="">請選擇處別</option>'}</select>
       </div>
       <button type="button" id="toolbox-auth-submit">進入工具箱</button>
       <p id="toolbox-auth-msg" class="hidden"></p>
@@ -153,6 +175,8 @@
       </p>
       <a id="toolbox-auth-admin-link" href="./admin.html">管理員核准帳號</a>
     `;
+
+    populateDepartmentSelect($('toolbox-auth-team'));
 
     if (!document.getElementById('toolbox-auth-lite-style')) {
       const st = document.createElement('style');
@@ -170,7 +194,9 @@
         '.lite-auth-quote p,#quote-text-gate{margin:0!important;text-align:left!important;font-size:.92rem!important;font-weight:800!important;line-height:1.45!important;color:#0f172a!important}',
         '.toolbox-auth-card--lite label{margin-top:.7rem;color:#334155}',
         '.toolbox-auth-card--lite input{border:1.5px solid #cbd5e1;border-radius:.8rem;padding:.62rem .75rem;background:#fff;transition:border-color .15s,box-shadow .15s}',
+        '.toolbox-auth-card--lite select{border:1.5px solid #cbd5e1;border-radius:.8rem;padding:.62rem .75rem;background:#fff;width:100%;color:#0f172a}',
         '.toolbox-auth-card--lite input:focus{outline:none;border-color:#0f766e;box-shadow:0 0 0 3px rgba(15,118,110,.15)}',
+        '.toolbox-auth-card--lite select:focus{outline:none;border-color:#0f766e;box-shadow:0 0 0 3px rgba(15,118,110,.15)}',
         '#toolbox-auth-register-extra.hidden{display:none}',
         '#toolbox-auth-gate input[type="password"]{width:100%}',
         '.toolbox-auth-card--lite #toolbox-auth-submit{margin-top:1.1rem;border-radius:.9rem;padding:.72rem;font-weight:800;letter-spacing:.02em;background:linear-gradient(135deg,#0f766e,#0d9488);box-shadow:0 10px 22px rgba(15,118,110,.28)}',
@@ -229,6 +255,114 @@
     setGateMessage('');
   }
 
+  function needsTeam(user) {
+    const u = user || session?.supabaseUser || session?.user;
+    return !String(u?.team || '').trim();
+  }
+
+  function ensureTeamGate() {
+    let gate = $('toolbox-team-gate');
+    if (gate) return gate;
+    gate = document.createElement('div');
+    gate.id = 'toolbox-team-gate';
+    gate.className = 'hidden';
+    gate.setAttribute('role', 'dialog');
+    gate.setAttribute('aria-modal', 'true');
+    gate.innerHTML =
+      '<div class="toolbox-team-card toolbox-auth-card toolbox-auth-card--lite">' +
+      '<h2 id="toolbox-team-title">請補填處別</h2>' +
+      '<p class="lite-auth-hint">您的帳號尚未設定處別，請選擇後才能繼續使用工具箱。</p>' +
+      '<label for="toolbox-team-select">處別</label>' +
+      '<select id="toolbox-team-select" required></select>' +
+      '<button type="button" id="toolbox-team-submit">確認並進入</button>' +
+      '<p id="toolbox-team-msg" class="hidden"></p>' +
+      '</div>';
+    document.body.appendChild(gate);
+    populateDepartmentSelect($('toolbox-team-select'));
+    $('toolbox-team-submit')?.addEventListener('click', () => {
+      void submitTeamGate();
+    });
+    $('toolbox-team-select')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') void submitTeamGate();
+    });
+    if (!document.getElementById('toolbox-team-gate-style')) {
+      const st = document.createElement('style');
+      st.id = 'toolbox-team-gate-style';
+      st.textContent = [
+        '#toolbox-team-gate{position:fixed;inset:0;z-index:100001;display:flex;align-items:center;justify-content:center;padding:1rem;background:rgba(2,6,23,.72);backdrop-filter:blur(4px)}',
+        '#toolbox-team-gate.hidden{display:none!important}',
+        '#toolbox-team-gate .toolbox-team-card{max-width:21.5rem;width:100%}',
+        '#toolbox-team-gate h2{margin:0 0 .35rem;font-size:1.2rem;color:#0f172a}',
+        '#toolbox-team-submit{margin-top:1rem;width:100%;border:0;border-radius:.9rem;padding:.72rem;font-weight:800;color:#fff;background:linear-gradient(135deg,#0f766e,#0d9488);cursor:pointer}',
+        '#toolbox-team-msg{margin-top:.65rem;font-size:.82rem;color:#0f766e}',
+        '#toolbox-team-msg.is-error{color:#b91c1c}'
+      ].join('');
+      document.head.appendChild(st);
+    }
+    return gate;
+  }
+
+  function setTeamGateMessage(msg, isError) {
+    const el = $('toolbox-team-msg');
+    if (!el) return;
+    el.textContent = msg || '';
+    el.classList.toggle('is-error', !!isError);
+    el.classList.toggle('hidden', !msg);
+  }
+
+  function showTeamGate() {
+    document.body.classList.add('toolbox-auth-pending');
+    $('toolbox-auth-gate')?.classList.add('hidden');
+    ensureTeamGate().classList.remove('hidden');
+    populateDepartmentSelect($('toolbox-team-select'));
+    ready = false;
+    setTeamGateMessage('');
+    $('toolbox-team-select')?.focus();
+  }
+
+  function hideTeamGate() {
+    $('toolbox-team-gate')?.classList.add('hidden');
+  }
+
+  async function submitTeamGate() {
+    const team = $('toolbox-team-select')?.value?.trim() || '';
+    if (!team) {
+      setTeamGateMessage('請選擇處別', true);
+      return;
+    }
+    const btn = $('toolbox-team-submit');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = '儲存中…';
+    }
+    setTeamGateMessage('');
+    try {
+      const data = await rpc('toolbox_set_my_team', {
+        p_token: session?.supabaseToken || '',
+        p_team: team
+      });
+      if (!data?.ok || !data.user) throw new Error(data?.error || '儲存失敗');
+      applySupabaseSession(session.supabaseToken, data.user);
+      hideTeamGate();
+      unlockApp();
+    } catch (e) {
+      setTeamGateMessage(e.message || '儲存失敗', true);
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = '確認並進入';
+      }
+    }
+  }
+
+  async function finishAuthEntry() {
+    if (needsTeam()) {
+      showTeamGate();
+      return;
+    }
+    unlockApp();
+  }
+
   function updateUserBar() {
     const bar = $('toolbox-user-bar');
     const label = $('toolbox-user-label');
@@ -239,7 +373,11 @@
     }
     const u = session.user;
     const uname = session.supabaseUser?.username || u.username || '';
-    label.textContent = uname ? `${u.name || uname} · ${uname}` : `${u.name || '使用者'}`;
+    const team = session.supabaseUser?.team || u.team || '';
+    const parts = [u.name || uname || '使用者'];
+    if (team) parts.push(team);
+    if (uname) parts.push(uname);
+    label.textContent = parts.join(' · ');
     bar.classList.remove('hidden');
   }
 
@@ -268,7 +406,8 @@
         username: user.username,
         name: user.name || user.username,
         role: user.role || 'business',
-        status: user.status
+        status: user.status,
+        team: user.team || ''
       },
       supabaseUser: user
     };
@@ -291,14 +430,15 @@
     });
     if (!data?.ok || !data.token) throw new Error(data?.error || '無法登入');
     applySupabaseSession(data.token, data.user);
-    unlockApp();
+    await finishAuthEntry();
   }
 
-  async function register(username, password, name) {
+  async function register(username, password, name, team) {
     const data = await rpc('toolbox_register', {
       p_username: username,
       p_password: password,
-      p_name: name || ''
+      p_name: name || '',
+      p_team: team || ''
     });
     if (!data?.ok) throw new Error(data?.error || '註冊失敗');
     return data;
@@ -315,6 +455,7 @@
     clearStored();
     session = null;
     ready = false;
+    hideTeamGate();
     lockApp();
     setMode('login');
     setGateMessage('已登出', false);
@@ -347,6 +488,8 @@
   function bindGate() {
     if (!document.getElementById('toolbox-auth-username')) {
       rebuildGateForm();
+    } else {
+      populateDepartmentSelect($('toolbox-auth-team'));
     }
     wireRegisterSwitch();
     setMode('login');
@@ -356,6 +499,7 @@
       const password = $('toolbox-auth-password')?.value || '';
       const password2 = $('toolbox-auth-password2')?.value || '';
       const displayName = $('toolbox-auth-displayname')?.value?.trim() || '';
+      const team = $('toolbox-auth-team')?.value?.trim() || '';
 
       if (!username) {
         setGateMessage('請輸入帳號', true);
@@ -378,13 +522,17 @@
           setGateMessage('請輸入姓名', true);
           return;
         }
+        if (!team) {
+          setGateMessage('請選擇處別', true);
+          return;
+        }
       }
 
       setGateMessage('');
       setGateLoading(true);
       try {
         if (mode === 'register') {
-          const data = await register(username, password, displayName);
+          const data = await register(username, password, displayName, team);
           setMode('login');
           $('toolbox-auth-password').value = '';
           setGateMessage(data.message || '註冊成功，請等待核准', false);
@@ -423,7 +571,7 @@
       if (stored?.supabaseToken || stored?.token) {
         try {
           if (await validateSession(stored)) {
-            unlockApp();
+            await finishAuthEntry();
             return;
           }
           clearStored();
@@ -472,6 +620,7 @@
     getToken: () => session?.supabaseToken || '',
     getUser: () => session?.user || null,
     getProfile: () => null,
+    rpc,
     authHeaders: () => ({ 'Content-Type': 'application/json' }),
     authFetch: async () => {
       throw new Error('GitHub Pages 靜態版不提供 API，請改用 Render 完整版');

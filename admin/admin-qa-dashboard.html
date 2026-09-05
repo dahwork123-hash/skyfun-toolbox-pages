@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>行政 QA 檢核 — 星鴻工具箱</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <style>
+    body { font-family: system-ui, "Microsoft JhengHei", sans-serif; background: #0c1222; color: #e2e8f0; min-height: 100vh; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 1rem; }
+    input, textarea, select { background: #0f172a; border: 1px solid #475569; border-radius: 0.5rem; padding: 0.5rem 0.75rem; color: #f8fafc; width: 100%; }
+    textarea { min-height: 4rem; resize: vertical; }
+    .item { border: 1px solid #334155; border-radius: 0.75rem; padding: 0.85rem; background: #0f172a; margin-bottom: 0.65rem; }
+    .item-title { font-weight: 800; color: #5eead4; margin-bottom: 0.35rem; }
+    .item-meta { font-size: 0.75rem; color: #94a3b8; margin-bottom: 0.5rem; }
+    .item-body { font-size: 0.875rem; white-space: pre-wrap; color: #cbd5e1; line-height: 1.5; }
+    .item-question-ref { border: 1px solid #334155; border-left: 3px solid #5eead4; border-radius: 0.5rem; padding: 0.65rem 0.75rem; margin-bottom: 0.65rem; background: #020617; }
+    .item-question-ref-label, .item-answer-label { font-size: 0.72rem; font-weight: 800; margin-bottom: 0.35rem; }
+    .item-question-ref-label { color: #5eead4; }
+    .item-answer-label { color: #94a3b8; }
+    .act-btn { border: 0; border-radius: 0.45rem; padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 700; cursor: pointer; margin-right: 0.35rem; margin-top: 0.5rem; }
+    .act-ok { background: #15803d; color: #fff; }
+    .act-no { background: #b91c1c; color: #fff; }
+    .act-del { background: #7f1d1d; color: #fecaca; border: 1px solid #991b1b; }
+    .act-view { background: #1e3a5f; color: #bae6fd; border: 1px solid #334155; }
+    .section-title { font-size: 1.05rem; font-weight: 800; color: #99f6e4; margin-bottom: 0.75rem; }
+    .empty { color: #64748b; font-size: 0.875rem; padding: 0.5rem 0; }
+    .badge { font-size: 0.68rem; font-weight: 800; padding: 0.15rem 0.45rem; border-radius: 0.35rem; display: inline-block; }
+    .badge-pending { background: #78350f; color: #fcd34d; }
+    .badge-double { background: #fef3c7; color: #b45309; border: 1px solid #fbbf24; font-size: 0.68rem; padding: 0.12rem 0.4rem; border-radius: 0.35rem; margin-left: 0.35rem; vertical-align: middle; font-weight: 700; }
+    .badge-quality { background: #ede9fe; color: #6d28d9; border: 1px solid #c4b5fd; margin-left: 0.35rem; }
+    .item--quality { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); border-color: #6366f1; }
+    .quality-check { display: flex; align-items: center; gap: 0.35rem; margin-top: 0.45rem; font-size: 0.78rem; color: #c4b5fd; }
+    .quality-check input { width: auto; accent-color: #8b5cf6; }
+    .badge-ok { background: #064e3b; color: #6ee7b7; }
+    .badge-no { background: #7f1d1d; color: #fecaca; }
+    .badge-cat { background: #312e81; color: #c7d2fe; margin-right: 0.35rem; }
+    .review-note-box { margin-top: 0.5rem; padding: 0.45rem 0.6rem; border-radius: 0.45rem; background: #422006; border: 1px solid #78350f; font-size: 0.78rem; color: #fde68a; }
+    .all-row { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 0.5rem; }
+    .all-row-main { flex: 1 1 12rem; min-width: 0; }
+    .all-row-actions { flex: 0 0 auto; }
+    .detail-panel { border: 1px solid #475569; border-radius: 0.75rem; padding: 0.85rem; margin-top: 0.5rem; background: #020617; }
+    .item-images { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.55rem; }
+    .item-images a { display: block; width: 4.5rem; height: 4.5rem; border-radius: 0.45rem; overflow: hidden; border: 1px solid #475569; }
+    .item-images img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.75rem; }
+    .tab-btn { border: 1px solid #475569; background: #0f172a; color: #94a3b8; border-radius: 0.5rem; padding: 0.35rem 0.75rem; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+    .tab-btn.is-active { background: #0f766e; border-color: #14b8a6; color: #fff; }
+    .tab-panel.hidden { display: none; }
+    .points-filters { display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: end; margin-bottom: 0.75rem; }
+    .points-filters label { display: block; font-size: 0.72rem; color: #94a3b8; margin-bottom: 0.25rem; }
+    .points-filters .field { flex: 1 1 9rem; min-width: 0; }
+    .points-filters input[type="date"] { width: 100%; margin-top: 0; }
+    .points-quick { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .points-quick button { border: 1px solid #475569; background: #0f172a; color: #94a3b8; border-radius: 0.45rem; padding: 0.3rem 0.6rem; font-size: 0.72rem; font-weight: 700; cursor: pointer; }
+    .points-quick button.is-active { background: #312e81; border-color: #6366f1; color: #e9d5ff; }
+    .points-summary { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .points-summary .chip { background: #0f172a; border: 1px solid #334155; border-radius: 0.65rem; padding: 0.45rem 0.65rem; font-size: 0.78rem; color: #cbd5e1; }
+    .points-summary .chip strong { color: #5eead4; margin-right: 0.25rem; }
+    .points-table-wrap { overflow-x: auto; }
+    .points-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .points-table th, .points-table td { border-bottom: 1px solid #334155; padding: 0.55rem 0.45rem; text-align: left; white-space: nowrap; }
+    .points-table th { color: #94a3b8; font-size: 0.72rem; font-weight: 800; }
+    .points-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .points-table tr:hover td { background: rgba(15, 23, 42, 0.55); }
+    .points-table .rank { color: #fcd34d; font-weight: 800; width: 2.5rem; }
+    .points-table .total { color: #5eead4; font-weight: 800; }
+  </style>
+</head>
+<body class="p-4 md:p-8 max-w-4xl mx-auto space-y-6">
+  <header>
+    <h1 class="text-2xl font-black text-teal-300">行政 QA 檢核後台</h1>
+    <p class="text-slate-400 text-sm mt-1">小組長檢核提問／回答、管理所有問題 · <a class="text-teal-300 underline" href="../index.html">回工具箱</a></p>
+  </header>
+
+  <section class="card p-4 space-y-3" id="login-panel">
+    <label class="block text-sm text-slate-400">後台密碼（Supabase admin_secret）</label>
+    <div class="flex flex-wrap gap-2">
+      <input type="password" id="admin-secret" placeholder="後台密碼" class="flex-1 min-w-[12rem]" />
+      <button type="button" id="btn-login" class="px-4 py-2 rounded-lg bg-teal-600 text-white font-bold">連線</button>
+    </div>
+    <p id="login-msg" class="text-sm text-rose-300 hidden"></p>
+  </section>
+
+  <section class="card p-4 hidden space-y-4" id="main-panel">
+    <div class="flex flex-wrap items-center gap-3">
+      <button type="button" id="btn-refresh" class="text-sm px-3 py-1.5 rounded-lg border border-slate-600">重新整理</button>
+      <p class="text-sm text-slate-400" id="count">—</p>
+      <p class="text-sm text-teal-300" id="reviewer-info">—</p>
+    </div>
+    <p id="msg" class="text-sm text-rose-300"></p>
+
+    <div class="tabs">
+      <button type="button" class="tab-btn is-active" data-tab="pending">待檢核</button>
+      <button type="button" class="tab-btn" data-tab="all">所有問題</button>
+      <button type="button" class="tab-btn" data-tab="points">點數報表</button>
+    </div>
+
+    <div id="tab-pending" class="tab-panel space-y-4">
+      <div>
+        <h2 class="section-title">待檢核提問</h2>
+        <div id="questions"></div>
+      </div>
+      <div>
+        <h2 class="section-title">待檢核回答</h2>
+        <div id="answers"></div>
+      </div>
+    </div>
+
+    <div id="tab-all" class="tab-panel hidden space-y-3">
+      <div class="flex flex-wrap gap-2 items-end">
+        <div class="flex-1 min-w-[12rem]">
+          <label class="block text-xs text-slate-400 mb-1">關鍵字搜尋</label>
+          <input type="search" id="all-search" placeholder="標題、內容、提問者…" />
+        </div>
+        <button type="button" id="btn-all-search" class="text-sm px-3 py-2 rounded-lg bg-teal-700 text-white font-bold">搜尋</button>
+      </div>
+      <p class="text-xs text-slate-500" id="all-count">—</p>
+      <div id="all-questions"></div>
+      <div id="all-detail" class="detail-panel hidden"></div>
+    </div>
+
+    <div id="tab-points" class="tab-panel hidden space-y-3">
+      <h2 class="section-title">所有人點數（依檢核通過時間）</h2>
+      <div class="points-filters">
+        <div class="field">
+          <label for="points-from">開始日期</label>
+          <input type="date" id="points-from" />
+        </div>
+        <div class="field">
+          <label for="points-to">結束日期</label>
+          <input type="date" id="points-to" />
+        </div>
+        <button type="button" id="btn-points-search" class="text-sm px-3 py-2 rounded-lg bg-teal-700 text-white font-bold">查詢</button>
+      </div>
+      <div class="points-quick">
+        <button type="button" class="points-preset is-active" data-preset="all">全部</button>
+        <button type="button" class="points-preset" data-preset="month">本月</button>
+        <button type="button" class="points-preset" data-preset="last-month">上月</button>
+        <button type="button" class="points-preset" data-preset="today">今天</button>
+      </div>
+      <div class="points-summary" id="points-summary"></div>
+      <p class="text-xs text-slate-500" id="points-range">—</p>
+      <div class="points-table-wrap">
+        <table class="points-table">
+          <thead>
+            <tr>
+              <th>#</th><th>姓名</th><th>帳號</th><th>處別</th>
+              <th class="num">提問點</th><th class="num">提問次</th>
+              <th class="num">回答點</th><th class="num">回答次</th>
+              <th class="num">總點</th>
+            </tr>
+          </thead>
+          <tbody id="points-rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    (function () {
+      const SECRET_KEY = 'skyfun-admin-qa-secret';
+      const AUTH_STORAGE_KEY = 'skyfun-toolbox-auth-supabase-v1';
+      let client = null;
+      let secret = '';
+      let activeTab = 'pending';
+      let expandedQuestionId = null;
+      let canSetQuality = false;
+
+      function toolboxSession() {
+        try {
+          return JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY) || 'null');
+        } catch {
+          return null;
+        }
+      }
+
+      function toolboxToken() {
+        return toolboxSession()?.supabaseToken || '';
+      }
+
+      function toolboxUserLabel() {
+        const u = toolboxSession()?.user;
+        if (!u) return '';
+        return String(u.name || u.username || '').trim();
+      }
+
+      function adminArgs(extra) {
+        return Object.assign({ p_secret: secret }, extra || {});
+      }
+
+      function rpcArgs(extra) {
+        return Object.assign({ p_secret: secret, p_token: toolboxToken() }, extra || {});
+      }
+
+      function updateReviewerInfo(name) {
+        const el = document.getElementById('reviewer-info');
+        if (!el) return;
+        const label = toolboxUserLabel() || name || '';
+        if (!label) {
+          el.textContent = '（未偵測到工具箱登入，僅可檢核；優質認定需婷婷帳號）';
+          el.className = 'text-sm text-amber-300';
+          return;
+        }
+        el.textContent = '檢核者：' + label + (canSetQuality ? ' · 可認定優質' : ' · 小組長檢核');
+        el.className = 'text-sm ' + (canSetQuality ? 'text-purple-300' : 'text-teal-300');
+      }
+
+      function cfg() {
+        const c = window.SKYFUN_SUPABASE || {};
+        return { url: String(c.url || '').trim(), anonKey: String(c.anonKey || '').trim() };
+      }
+
+      function sb() {
+        if (client) return client;
+        const { url, anonKey } = cfg();
+        client = window.supabase.createClient(url, anonKey);
+        return client;
+      }
+
+      async function rpc(name, args) {
+        const { data, error } = await sb().rpc(name, args);
+        if (error) throw new Error(error.message || 'Supabase 錯誤');
+        return data;
+      }
+
+      function esc(s) {
+        return String(s || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function fmt(iso) {
+        if (!iso) return '—';
+        try { return new Date(iso).toLocaleString('zh-TW'); } catch { return iso; }
+      }
+
+      function statusBadge(status) {
+        const map = {
+          pending: ['badge-pending', '待檢核'],
+          approved: ['badge-ok', '已通過'],
+          rejected: ['badge-no', '未通過']
+        };
+        const pair = map[status] || ['badge-pending', status];
+        return '<span class="badge ' + pair[0] + '">' + esc(pair[1]) + '</span>';
+      }
+
+      function qualityBadge(kind, show) {
+        if (!show) return '';
+        const label = kind === 'answer' ? '⭐ 優質回答' : '⭐ 優質問題';
+        const tip = kind === 'answer' ? '婷婷認定之優質回答，點數翻倍' : '婷婷認定之優質問題，點數翻倍';
+        return '<span class="badge badge-quality" title="' + esc(tip) + '">' + esc(label) + '</span>';
+      }
+
+      function qualityCheckbox(kind) {
+        if (!canSetQuality) return '';
+        const base = kind === 'answer' ? 2 : 1;
+        const doubled = base * 2;
+        const label = kind === 'answer'
+          ? '認定為優質回答（通過後 +' + doubled + ' 點，原 +' + base + '）'
+          : '認定為優質問題（通過後 +' + doubled + ' 點，原 +' + base + '）';
+        return (
+          '<label class="quality-check">' +
+          '<input type="checkbox" class="review-quality" />' +
+          esc(label) +
+          '</label>'
+        );
+      }
+
+      function qualityToggle(kind, id, enabled) {
+        if (!canSetQuality) return '';
+        const label = kind === 'answer' ? '優質回答' : '優質問題';
+        return (
+          '<label class="quality-check">' +
+          '<input type="checkbox" class="set-quality" data-kind="' + esc(kind) + '" data-id="' + esc(id) + '"' +
+          (enabled ? ' checked' : '') + ' />' +
+          '標記為' + esc(label) +
+          '</label>'
+        );
+      }
+
+      function approveLabel(kind, isDouble, isQuality) {
+        const base = kind === 'answer' ? 2 : 1;
+        const pts = isQuality ? base * 2 : base;
+        return kind === 'question'
+          ? '通過（+' + pts + ' 提問點）'
+          : '通過（+' + pts + ' 回答點）';
+      }
+
+      function categoryLabel(cat) {
+        const map = {
+          system: '系統問題',
+          subsidy300: '300億問題',
+          review: '審核問題',
+          guild: '公會問題',
+          other: '其他',
+        };
+        return map[cat] || '';
+      }
+
+      function categoryBadge(cat) {
+        const label = categoryLabel(cat);
+        if (!label) return '';
+        return '<span class="badge badge-cat">' + esc(label) + '</span>';
+      }
+
+      function noteBox(note) {
+        if (!note || !String(note).trim()) return '';
+        return '<div class="review-note-box"><strong>檢核備註：</strong>' + esc(note) + '</div>';
+      }
+
+      function imagesHtml(images) {
+        const list = Array.isArray(images) ? images.filter(Boolean) : [];
+        if (!list.length) return '';
+        return (
+          '<div class="item-images">' +
+          list.map(function (url) {
+            return (
+              '<a href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' +
+              '<img src="' + esc(url) + '" alt="附加圖片" loading="lazy" />' +
+              '</a>'
+            );
+          }).join('') +
+          '</div>'
+        );
+      }
+
+      function renderPendingQuestions(items) {
+        const el = document.getElementById('questions');
+        if (!items.length) {
+          el.innerHTML = '<p class="empty">目前沒有待檢核提問。</p>';
+          return;
+        }
+        el.innerHTML = items.map(function (q) {
+          return (
+            '<article class="item" data-kind="question" data-id="' + esc(q.id) + '">' +
+            '<div class="item-title">' + categoryBadge(q.category) + esc(q.title) + '</div>' +
+            '<div class="item-meta">' + esc(q.askerName) + ' · ' + esc(fmt(q.createdAt)) + '</div>' +
+            '<div class="item-body">' + esc(q.body || '（無補充）') + '</div>' +
+            imagesHtml(q.images) +
+            '<textarea class="review-note mt-2" rows="2" placeholder="檢核備註（選填）"></textarea>' +
+            qualityCheckbox('question') +
+            '<div><button type="button" class="act-btn act-ok" data-act="approved">' + approveLabel('question', false, false) + '</button>' +
+            '<button type="button" class="act-btn act-no" data-act="rejected">不通過</button></div>' +
+            '</article>'
+          );
+        }).join('');
+      }
+
+      function questionRefHtml(a) {
+        return (
+          '<div class="item-question-ref">' +
+          '<div class="item-question-ref-label">原提問 · ' + esc(a.questionAskerName || '—') +
+          (a.questionCreatedAt ? ' · ' + esc(fmt(a.questionCreatedAt)) : '') + '</div>' +
+          '<div class="item-title">' + categoryBadge(a.questionCategory) + esc(a.questionTitle || '（無標題）') + '</div>' +
+          '<div class="item-body">' + esc(a.questionBody || '（無補充）') + '</div>' +
+          imagesHtml(a.questionImages) +
+          '</div>'
+        );
+      }
+
+      function renderPendingAnswers(items) {
+        const el = document.getElementById('answers');
+        if (!items.length) {
+          el.innerHTML = '<p class="empty">目前沒有待檢核回答。</p>';
+          return;
+        }
+        el.innerHTML = items.map(function (a) {
+          return (
+            '<article class="item" data-kind="answer" data-id="' + esc(a.id) + '">' +
+            questionRefHtml(a) +
+            '<div class="item-answer-label">待檢核回答 · ' + esc(a.answererName) + ' · ' + esc(fmt(a.createdAt)) + '</div>' +
+            '<div class="item-body">' + esc(a.body) + '</div>' +
+            imagesHtml(a.images) +
+            '<textarea class="review-note mt-2" rows="2" placeholder="檢核備註（選填）"></textarea>' +
+            qualityCheckbox('answer') +
+            '<div><button type="button" class="act-btn act-ok" data-act="approved">' + approveLabel('answer', false, false) + '</button>' +
+            '<button type="button" class="act-btn act-no" data-act="rejected">不通過</button></div>' +
+            '</article>'
+          );
+        }).join('');
+      }
+
+      function renderAllQuestions(items) {
+        const el = document.getElementById('all-questions');
+        if (!items.length) {
+          el.innerHTML = '<p class="empty">尚無問題，或搜尋無結果。</p>';
+          return;
+        }
+        el.innerHTML = items.map(function (q) {
+          return (
+            '<article class="item" data-all-id="' + esc(q.id) + '">' +
+            '<div class="all-row">' +
+            '<div class="all-row-main">' +
+            '<div class="item-title">' + esc(q.title) + ' ' + statusBadge(q.askReviewStatus) + qualityBadge('question', q.isQuality) + qualityBadge('answer', q.hasQualityAnswer) + '</div>' +
+            '<div class="item-meta">' + esc(q.askerName) + ' · ' + esc(fmt(q.createdAt)) +
+            ' · 回答 ' + esc(q.answerCount || 0) + '</div>' +
+            (q.body ? '<div class="item-body">' + esc(q.body) + '</div>' : '') +
+            noteBox(q.askReviewNote) +
+            '</div>' +
+            '<div class="all-row-actions">' +
+            '<button type="button" class="act-btn act-view" data-all-act="view" data-id="' + esc(q.id) + '">查看</button>' +
+            '<button type="button" class="act-btn act-del" data-all-act="delete" data-id="' + esc(q.id) + '">刪除</button>' +
+            '</div></div></article>'
+          );
+        }).join('');
+      }
+
+      function renderAllDetail(data) {
+        const panel = document.getElementById('all-detail');
+        if (!data?.ok) {
+          panel.classList.remove('hidden');
+          panel.innerHTML = '<p class="text-rose-300">' + esc(data?.error || '讀取失敗') + '</p>';
+          return;
+        }
+        const q = data.question;
+        const answers = data.answers || [];
+        panel.classList.remove('hidden');
+        panel.innerHTML =
+          '<div class="flex flex-wrap justify-between gap-2 mb-2">' +
+          '<strong class="text-teal-300">' + esc(q.title) + '</strong>' +
+          '<button type="button" class="act-btn act-view" id="btn-close-detail">關閉</button></div>' +
+          '<div class="item-meta">' + esc(q.askerName) + ' · ' + esc(fmt(q.createdAt)) + ' · ' + statusBadge(q.askReviewStatus) + qualityBadge('question', q.isQuality) + '</div>' +
+          '<div class="item-body mt-2">' + esc(q.body || '（無補充）') + '</div>' +
+          noteBox(q.askReviewNote) +
+          (q.askReviewStatus === 'approved' ? qualityToggle('question', q.id, q.isQuality) : '') +
+          '<h3 class="text-sm font-bold text-slate-300 mt-3 mb-2">回答（' + answers.length + '）</h3>' +
+          (answers.length ? answers.map(function (a) {
+            return (
+              '<div class="item mb-2' + (a.isQuality ? ' item--quality' : '') + '">' +
+              '<div class="item-meta">' + esc(a.answererName) + ' · ' + esc(fmt(a.createdAt)) + ' · ' + statusBadge(a.reviewStatus) + qualityBadge('answer', a.isQuality) + '</div>' +
+              '<div class="item-body">' + esc(a.body) + '</div>' +
+              noteBox(a.reviewNote) +
+              (a.reviewStatus === 'approved' ? qualityToggle('answer', a.id, a.isQuality) : '') +
+              '</div>'
+            );
+          }).join('') : '<p class="empty">尚無回答</p>');
+        document.getElementById('btn-close-detail')?.addEventListener('click', function () {
+          panel.classList.add('hidden');
+          expandedQuestionId = null;
+        });
+      }
+
+      async function loadPending() {
+        const data = await rpc('admin_qa_admin_pending', rpcArgs());
+        if (!data?.ok) throw new Error(data?.error || '讀取失敗');
+        canSetQuality = !!data.canSetQuality;
+        updateReviewerInfo(data.reviewerName);
+        const qs = data.questions || [];
+        const ans = data.answers || [];
+        document.getElementById('count').textContent =
+          '待檢核：提問 ' + qs.length + ' · 回答 ' + ans.length;
+        renderPendingQuestions(qs);
+        renderPendingAnswers(ans);
+      }
+
+      async function loadAll() {
+        const query = document.getElementById('all-search').value.trim();
+        const data = await rpc('admin_qa_admin_list_questions', adminArgs({
+          p_query: query,
+          p_limit: 200,
+          p_offset: 0
+        }));
+        if (!data?.ok) throw new Error(data?.error || '讀取失敗');
+        const items = data.items || [];
+        document.getElementById('all-count').textContent = '共 ' + (data.total || items.length) + ' 則問題';
+        renderAllQuestions(items);
+        if (expandedQuestionId) {
+          const still = items.some(function (q) { return q.id === expandedQuestionId; });
+          if (still) await openAllDetail(expandedQuestionId);
+          else {
+            expandedQuestionId = null;
+            document.getElementById('all-detail').classList.add('hidden');
+          }
+        }
+      }
+
+      function fmtDateInput(d) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return y + '-' + m + '-' + day;
+      }
+
+      function applyPointsPreset(preset) {
+        const fromEl = document.getElementById('points-from');
+        const toEl = document.getElementById('points-to');
+        const now = new Date();
+        document.querySelectorAll('.points-preset').forEach(function (btn) {
+          btn.classList.toggle('is-active', btn.dataset.preset === preset);
+        });
+        if (preset === 'all') {
+          fromEl.value = '';
+          toEl.value = '';
+          return;
+        }
+        if (preset === 'today') {
+          const today = fmtDateInput(now);
+          fromEl.value = today;
+          toEl.value = today;
+          return;
+        }
+        if (preset === 'month') {
+          fromEl.value = fmtDateInput(new Date(now.getFullYear(), now.getMonth(), 1));
+          toEl.value = fmtDateInput(now);
+          return;
+        }
+        if (preset === 'last-month') {
+          const start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+          const end = new Date(now.getFullYear(), now.getMonth(), 0);
+          fromEl.value = fmtDateInput(start);
+          toEl.value = fmtDateInput(end);
+        }
+      }
+
+      function renderPointsReport(data) {
+        const summaryEl = document.getElementById('points-summary');
+        const rangeEl = document.getElementById('points-range');
+        const rowsEl = document.getElementById('points-rows');
+        const summary = data.summary || {};
+        const rows = data.rows || [];
+        const from = data.dateFrom || '';
+        const to = data.dateTo || '';
+        summaryEl.innerHTML =
+          '<div class="chip"><strong>' + esc(summary.userCount || 0) + '</strong>人</div>' +
+          '<div class="chip">總點 <strong>' + esc(summary.totalPoints || 0) + '</strong></div>' +
+          '<div class="chip">提問 <strong>' + esc(summary.askPoints || 0) + '</strong></div>' +
+          '<div class="chip">回答 <strong>' + esc(summary.answerPoints || 0) + '</strong></div>' +
+          '<div class="chip">事件 <strong>' + esc(summary.eventCount || 0) + '</strong></div>';
+        rangeEl.textContent = from || to
+          ? '區間：' + (from || '最早') + ' ～ ' + (to || '最新')
+          : '區間：全部時間';
+        if (!rows.length) {
+          rowsEl.innerHTML = '<tr><td colspan="9" class="empty">此區間尚無點數紀錄。</td></tr>';
+          return;
+        }
+        rowsEl.innerHTML = rows.map(function (row) {
+          return (
+            '<tr>' +
+            '<td class="rank">' + esc(row.rank) + '</td>' +
+            '<td>' + esc(row.userName) + '</td>' +
+            '<td>' + esc(row.username || '—') + '</td>' +
+            '<td>' + esc(row.team || '—') + '</td>' +
+            '<td class="num">' + esc(row.askPoints || 0) + '</td>' +
+            '<td class="num">' + esc(row.askCount || 0) + '</td>' +
+            '<td class="num">' + esc(row.answerPoints || 0) + '</td>' +
+            '<td class="num">' + esc(row.answerCount || 0) + '</td>' +
+            '<td class="num total">' + esc(row.totalPoints || 0) + '</td>' +
+            '</tr>'
+          );
+        }).join('');
+      }
+
+      async function loadPoints() {
+        const from = document.getElementById('points-from')?.value || '';
+        const to = document.getElementById('points-to')?.value || '';
+        const data = await rpc('admin_qa_admin_points_report', adminArgs({
+          p_date_from: from,
+          p_date_to: to
+        }));
+        if (!data?.ok) throw new Error(data?.error || '讀取失敗');
+        renderPointsReport(data);
+      }
+
+      async function loadList() {
+        document.getElementById('msg').textContent = '';
+        if (activeTab === 'pending') await loadPending();
+        else if (activeTab === 'all') await loadAll();
+        else if (activeTab === 'points') await loadPoints();
+      }
+
+      async function openAllDetail(id) {
+        expandedQuestionId = id;
+        const data = await rpc('admin_qa_admin_get_question', adminArgs({ p_question_id: id }));
+        renderAllDetail(data);
+      }
+
+      async function deleteQuestion(id, title) {
+        if (!confirm('確定要刪除問題「' + title + '」？\n（連同所有回答一併刪除，已核可的提問／回答點數也會扣回，無法復原）')) return;
+        const data = await rpc('admin_qa_admin_delete_question', adminArgs({ p_question_id: id }));
+        if (!data?.ok) throw new Error(data?.error || '刪除失敗');
+        document.getElementById('msg').textContent = data.message || '已刪除';
+        if (expandedQuestionId === id) {
+          expandedQuestionId = null;
+          document.getElementById('all-detail').classList.add('hidden');
+        }
+        await loadList();
+        if (activeTab === 'all') await loadPending();
+      }
+
+      async function review(kind, id, action, note, quality) {
+        const fn = kind === 'question' ? 'admin_qa_admin_review_question' : 'admin_qa_admin_review_answer';
+        const args = kind === 'question'
+          ? rpcArgs({ p_question_id: id, p_action: action, p_note: note || null, p_quality: !!quality })
+          : rpcArgs({ p_answer_id: id, p_action: action, p_note: note || null, p_quality: !!quality });
+        const data = await rpc(fn, args);
+        if (!data?.ok) throw new Error(data?.error || '更新失敗');
+        await loadList();
+        if (activeTab === 'pending') await loadAll();
+      }
+
+      async function setQuality(kind, id, enabled) {
+        const data = await rpc('admin_qa_admin_set_quality', rpcArgs({
+          p_kind: kind,
+          p_id: id,
+          p_enabled: !!enabled
+        }));
+        if (!data?.ok) throw new Error(data?.error || '更新失敗');
+        document.getElementById('msg').textContent = enabled ? '已標記為優質' : '已取消優質標記';
+        if (expandedQuestionId) await openAllDetail(expandedQuestionId);
+        await loadAll();
+      }
+
+      function setTab(tab) {
+        activeTab = tab;
+        document.querySelectorAll('.tab-btn').forEach(function (btn) {
+          btn.classList.toggle('is-active', btn.dataset.tab === tab);
+        });
+        document.getElementById('tab-pending').classList.toggle('hidden', tab !== 'pending');
+        document.getElementById('tab-all').classList.toggle('hidden', tab !== 'all');
+        document.getElementById('tab-points').classList.toggle('hidden', tab !== 'points');
+        loadList().catch(function (e) {
+          document.getElementById('msg').textContent = e.message;
+        });
+      }
+
+      document.getElementById('btn-login').addEventListener('click', async function () {
+        secret = document.getElementById('admin-secret').value.trim();
+        const msg = document.getElementById('login-msg');
+        msg.classList.add('hidden');
+        try {
+          const data = await rpc('admin_qa_admin_pending', rpcArgs());
+          if (!data?.ok) throw new Error(data?.error || '後台密碼錯誤');
+          canSetQuality = !!data.canSetQuality;
+          updateReviewerInfo(data.reviewerName);
+          sessionStorage.setItem(SECRET_KEY, secret);
+          document.getElementById('login-panel').classList.add('hidden');
+          document.getElementById('main-panel').classList.remove('hidden');
+          await loadList();
+        } catch (e) {
+          msg.textContent = e.message || '連線失敗';
+          msg.classList.remove('hidden');
+        }
+      });
+
+      document.getElementById('btn-refresh').addEventListener('click', function () {
+        loadList().catch(function (e) {
+          document.getElementById('msg').textContent = e.message;
+        });
+      });
+
+      document.querySelectorAll('.tab-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () { setTab(btn.dataset.tab); });
+      });
+
+      document.getElementById('btn-all-search').addEventListener('click', function () {
+        loadAll().catch(function (e) {
+          document.getElementById('msg').textContent = e.message;
+        });
+      });
+
+      document.getElementById('all-search').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          loadAll().catch(function (err) {
+            document.getElementById('msg').textContent = err.message;
+          });
+        }
+      });
+
+      document.getElementById('btn-points-search').addEventListener('click', function () {
+        document.querySelectorAll('.points-preset').forEach(function (btn) {
+          btn.classList.remove('is-active');
+        });
+        loadPoints().catch(function (e) {
+          document.getElementById('msg').textContent = e.message;
+        });
+      });
+
+      document.querySelectorAll('.points-preset').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          applyPointsPreset(btn.dataset.preset);
+          loadPoints().catch(function (e) {
+            document.getElementById('msg').textContent = e.message;
+          });
+        });
+      });
+
+      document.getElementById('tab-pending').addEventListener('click', function (e) {
+        const qualityEl = e.target.closest('.review-quality');
+        if (qualityEl) {
+          const item = qualityEl.closest('[data-kind]');
+          if (!item) return;
+          const kind = item.dataset.kind;
+          const okBtn = item.querySelector('[data-act="approved"]');
+          if (okBtn) okBtn.textContent = approveLabel(kind, false, qualityEl.checked);
+          return;
+        }
+        const btn = e.target.closest('[data-act]');
+        if (!btn) return;
+        const item = btn.closest('[data-kind]');
+        if (!item) return;
+        const noteEl = item.querySelector('.review-note');
+        const quality = item.querySelector('.review-quality')?.checked || false;
+        review(item.dataset.kind, item.dataset.id, btn.dataset.act, noteEl?.value?.trim() || '', quality)
+          .catch(function (err) {
+            document.getElementById('msg').textContent = err.message;
+          });
+      });
+
+      document.getElementById('all-detail').addEventListener('change', function (e) {
+        const cb = e.target.closest('.set-quality');
+        if (!cb) return;
+        setQuality(cb.dataset.kind, cb.dataset.id, cb.checked).catch(function (err) {
+          document.getElementById('msg').textContent = err.message;
+          cb.checked = !cb.checked;
+        });
+      });
+
+      document.getElementById('all-questions').addEventListener('click', function (e) {
+        const btn = e.target.closest('[data-all-act]');
+        if (!btn) return;
+        const id = btn.dataset.id;
+        const row = btn.closest('[data-all-id]');
+        const title = row?.querySelector('.item-title')?.textContent?.trim() || '此問題';
+        if (btn.dataset.allAct === 'view') {
+          openAllDetail(id).catch(function (err) {
+            document.getElementById('msg').textContent = err.message;
+          });
+        } else if (btn.dataset.allAct === 'delete') {
+          deleteQuestion(id, title).catch(function (err) {
+            document.getElementById('msg').textContent = err.message;
+          });
+        }
+      });
+
+      const saved = sessionStorage.getItem(SECRET_KEY);
+      if (saved) document.getElementById('admin-secret').value = saved;
+    })();
+  </script>
+</body>
+</html>

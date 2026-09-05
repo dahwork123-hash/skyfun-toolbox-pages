@@ -26,7 +26,7 @@
         '高二處',
     ];
 
-    window.SKYFUN_STANDALONE_DEPARTMENTS = ['租賃管理部', '客服部', '客滿部', '財務部'];
+    window.SKYFUN_STANDALONE_DEPARTMENTS = ['行政管理部', '總經理室', '租賃管理部', '客服部', '客滿部', '財務部'];
 
     window.SKYFUN_DEPARTMENTS = window.SKYFUN_BUSINESS_OFFICES.concat(window.SKYFUN_STANDALONE_DEPARTMENTS);
 
@@ -41,7 +41,7 @@
     /** @param {string} [selected] */
     window.buildSkyfunDepartmentSelectHtml = function buildSkyfunDepartmentSelectHtml(selected) {
         const sel = String(selected || '').trim();
-        let html = '<option value="">請選擇部門</option>';
+        let html = '<option value="">請選擇處別</option>';
         if (sel && !window.SKYFUN_DEPARTMENTS.includes(sel)) {
             html += `<option value="${escapeHtml(sel)}" selected>${escapeHtml(sel)}（舊）</option>`;
         }

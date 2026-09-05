@@ -410,11 +410,35 @@
         .nb-hub-track small { font-size: 0.72rem; color: #64748b; font-weight: 600; line-height: 1.35; }
         .nb-hub-track-cta { font-size: 0.75rem; font-weight: 800; color: #b45309; margin-top: 0.25rem; }
         .nb-hub-track--rentmgr .nb-hub-track-cta { color: #be123c; }
-        /* 業務問答聊天：按鈕在右下，面板向上展開（內容由上往下排） */
-        .bqa-root {
+        /* 業務問答聊天：按鈕在右下（意見回饋下方），面板向上展開 */
+        .feedback-fab {
             position: fixed;
             right: max(0.65rem, env(safe-area-inset-right));
             bottom: max(0.65rem, env(safe-area-inset-bottom));
+            z-index: 9550;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.55rem 0.95rem;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+            color: #fff;
+            font-weight: 800;
+            font-size: 0.82rem;
+            letter-spacing: 0.02em;
+            box-shadow: 0 8px 24px rgba(13, 148, 136, 0.35);
+            border: 2px solid rgba(255, 255, 255, 0.92);
+            transition: transform 140ms ease, box-shadow 200ms ease, filter 160ms ease;
+        }
+        .feedback-fab:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+            box-shadow: 0 12px 28px rgba(13, 148, 136, 0.42);
+        }
+        .bqa-root {
+            position: fixed;
+            right: max(0.65rem, env(safe-area-inset-right));
+            bottom: max(3.55rem, calc(0.65rem + env(safe-area-inset-bottom) + 2.65rem));
             z-index: 9600;
             font-family: inherit;
             display: flex;
@@ -642,6 +666,301 @@
         .nb-quest-cta strong { display: block; font-size: 1.05rem; color: #6b21a8; }
         .nb-quest-cta small { display: block; font-size: 0.75rem; color: #64748b; margin-top: 0.25rem; font-weight: 600; }
         .nb-quest-cta span { font-size: 0.8rem; font-weight: 800; color: #9333ea; margin-top: 0.35rem; display: inline-block; }
+        /* 行政 QA */
+        .aqa-hero {
+            border-radius: 1.5rem;
+            padding: 1.25rem 1.35rem;
+            background: linear-gradient(135deg, #ccfbf1 0%, #fff 55%, #f8fafc 100%);
+            border: 1px solid #99f6e4;
+            box-shadow: 0 10px 30px rgba(13, 148, 136, 0.08);
+        }
+        .aqa-hero-title { font-size: 1.65rem; font-weight: 900; color: #0f766e; margin-bottom: 0.35rem; }
+        .aqa-hero-intro { display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 0.85rem; }
+        .aqa-hero-block { font-size: 0.875rem; color: #475569; line-height: 1.55; margin: 0; }
+        .aqa-hero-label { display: block; font-size: 0.78rem; font-weight: 800; color: #0f766e; margin-bottom: 0.2rem; }
+        .aqa-hero-list {
+            list-style: none !important;
+            margin: 0.25rem 0 0;
+            padding-left: 0 !important;
+            font-size: 0.875rem;
+            color: #475569;
+            line-height: 1.6;
+        }
+        .aqa-hero-list > li {
+            display: block !important;
+            margin-bottom: 0.35rem;
+            padding-left: 0;
+        }
+        .aqa-hero-num {
+            font-weight: 800;
+            color: #0f766e;
+            margin-right: 0.15rem;
+        }
+        .aqa-hero-list li:last-child { margin-bottom: 0; }
+        .aqa-hero-sub { display: inline-block; margin-top: 0.15rem; font-size: 0.82rem; color: #64748b; }
+        .aqa-hero-desc { font-size: 0.875rem; color: #475569; line-height: 1.55; margin-bottom: 0.85rem; }
+        .aqa-stats { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .aqa-period-note { width: 100%; margin: 0 0 0.15rem; font-size: 0.72rem; font-weight: 700; color: #64748b; }
+        .aqa-stat {
+            flex: 1 1 8rem;
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.85rem;
+            padding: 0.55rem 0.75rem;
+            font-size: 0.8rem;
+            color: #334155;
+        }
+        .aqa-stat strong { display: block; font-size: 0.72rem; color: #64748b; margin-bottom: 0.15rem; }
+        .aqa-stat span { font-weight: 800; color: #0f766e; font-size: 1rem; }
+        .aqa-stat--rank { flex: 1 1 100%; background: #ecfdf5; border-color: #6ee7b7; color: #065f46; }
+        .aqa-stat-note { flex: 1 1 100%; font-size: 0.72rem; color: #64748b; line-height: 1.45; padding: 0.15rem 0.1rem 0; }
+        .aqa-stat--muted { flex: 1 1 100%; background: transparent; border-style: dashed; color: #64748b; }
+        .aqa-rank { margin-top: 0.85rem; padding: 0.75rem 0.85rem; border-radius: 0.85rem; background: #fff; border: 1px solid #99f6e4; }
+        .aqa-rank-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.45rem 0.75rem; margin-bottom: 0.55rem; }
+        .aqa-rank-title { font-size: 0.82rem; font-weight: 800; color: #0f766e; margin: 0; }
+        .aqa-rank-period { width: 100%; font-size: 0.72rem; font-weight: 700; color: #64748b; margin-top: 0.1rem; }
+        .aqa-rank-prizes { display: flex; flex-wrap: wrap; gap: 0.35rem; font-size: 0.72rem; font-weight: 700; }
+        .aqa-rank-prize { padding: 0.12rem 0.45rem; border-radius: 999px; white-space: nowrap; }
+        .aqa-rank-prize--1 { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+        .aqa-rank-prize--2 { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+        .aqa-rank-prize--3 { background: #ffedd5; color: #9a3412; border: 1px solid #fdba74; }
+        .aqa-rank-list { display: flex; flex-direction: column; gap: 0.45rem; }
+        .aqa-rank-item { display: flex; align-items: center; gap: 0.55rem; padding: 0.55rem 0.65rem; border-radius: 0.65rem; background: #f8fafc; border: 1px solid #e2e8f0; }
+        .aqa-rank-item--1 { background: linear-gradient(90deg, #fef3c7, #fffbeb); border-color: #fcd34d; }
+        .aqa-rank-item--2 { background: linear-gradient(90deg, #f1f5f9, #f8fafc); border-color: #cbd5e1; }
+        .aqa-rank-item--3 { background: linear-gradient(90deg, #ffedd5, #fff7ed); border-color: #fdba74; }
+        .aqa-rank-medal { font-size: 1.15rem; width: 1.5rem; text-align: center; flex-shrink: 0; }
+        .aqa-rank-main { flex: 1; min-width: 0; }
+        .aqa-rank-who { font-weight: 800; color: #0f172a; font-size: 0.9rem; line-height: 1.35; }
+        .aqa-rank-team { display: inline-block; margin-left: 0.35rem; padding: 0.08rem 0.45rem; border-radius: 999px; background: #e0f2fe; color: #0369a1; font-size: 0.72rem; font-weight: 700; vertical-align: middle; }
+        .aqa-rank-breakdown { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.3rem; }
+        .aqa-rank-tag { display: inline-flex; align-items: center; padding: 0.12rem 0.45rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; white-space: nowrap; }
+        .aqa-rank-tag--ask { background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; }
+        .aqa-rank-tag--ans { background: #d1fae5; color: #047857; border: 1px solid #6ee7b7; }
+        .aqa-rank-total { text-align: center; flex-shrink: 0; min-width: 2.8rem; }
+        .aqa-rank-total strong { display: block; color: #0f766e; font-size: 1.15rem; line-height: 1.1; }
+        .aqa-rank-total span { display: block; font-size: 0.68rem; color: #64748b; font-weight: 700; }
+        .aqa-role { display: inline-block; padding: 0.06rem 0.4rem; border-radius: 999px; font-size: 0.68rem; font-weight: 800; margin-right: 0.2rem; vertical-align: middle; }
+        .aqa-role--ask { background: #dbeafe; color: #1d4ed8; }
+        .aqa-role--ans { background: #d1fae5; color: #047857; }
+        .aqa-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 1.25rem;
+            padding: 1rem 1.15rem;
+            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+        }
+        .aqa-section-title { font-size: 1rem; font-weight: 800; color: #0f172a; margin-bottom: 0.65rem; }
+        .aqa-input, .aqa-textarea {
+            width: 100%;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.65rem;
+            padding: 0.55rem 0.75rem;
+            font-size: 0.95rem;
+            color: #0f172a;
+            background: #f8fafc;
+        }
+        .aqa-textarea { resize: vertical; min-height: 4.5rem; margin-top: 0.5rem; }
+        .aqa-search-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; margin-bottom: 0.65rem; }
+        .aqa-filter-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 0.65rem; }
+        .aqa-select {
+            flex: 1 1 10rem; min-width: 0; width: 100%; padding: 0.55rem 0.65rem;
+            border: 1px solid #cbd5e1; border-radius: 0.65rem; font-size: 0.875rem;
+            background: #fff; color: #0f172a; margin-top: 0;
+        }
+        .aqa-search { flex: 1 1 12rem; margin-top: 0; }
+        .aqa-badge--cat { background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
+        .aqa-list { display: flex; flex-direction: column; gap: 0.55rem; }
+        .aqa-item {
+            width: 100%;
+            text-align: left;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.85rem;
+            padding: 0.75rem 0.85rem;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .aqa-item:hover { border-color: #14b8a6; box-shadow: 0 4px 14px rgba(20, 184, 166, 0.12); }
+        .aqa-item-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; }
+        .aqa-item-title { flex: 1 1 8rem; font-size: 0.95rem; font-weight: 800; color: #0f172a; margin: 0; min-width: 0; }
+        .aqa-item-meta { font-size: 0.75rem; color: #64748b; margin-top: 0.35rem; }
+        .aqa-badge { font-size: 0.68rem; font-weight: 800; padding: 0.15rem 0.45rem; border-radius: 0.35rem; white-space: nowrap; }
+        .aqa-badge--pending { background: #fef3c7; color: #92400e; }
+        .aqa-badge--ok { background: #d1fae5; color: #065f46; }
+        .aqa-badge--no { background: #fee2e2; color: #991b1b; }
+        .aqa-badge--double { background: #fef3c7; color: #b45309; border: 1px solid #fbbf24; }
+        .aqa-badge--quality { background: #ede9fe; color: #6d28d9; border: 1px solid #c4b5fd; }
+        .aqa-item--quality {
+            background: linear-gradient(135deg, #f5f3ff 0%, #faf5ff 100%);
+            border-color: #c4b5fd;
+        }
+        .aqa-item--quality:hover {
+            border-color: #8b5cf6;
+            box-shadow: 0 4px 14px rgba(139, 92, 246, 0.18);
+        }
+        .aqa-detail-card, .aqa-answer-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 0.85rem;
+            padding: 0.85rem;
+            background: #f8fafc;
+            margin-bottom: 0.65rem;
+        }
+        .aqa-detail-card--quality, .aqa-answer-card.aqa-detail-card--quality {
+            background: linear-gradient(135deg, #f5f3ff 0%, #faf5ff 100%);
+            border-color: #c4b5fd;
+        }
+        .aqa-detail-title { font-size: 1.05rem; font-weight: 900; color: #0f172a; margin: 0; }
+        .aqa-detail-body { white-space: pre-wrap; font-size: 0.9rem; color: #334155; line-height: 1.55; margin-top: 0.5rem; }
+        .aqa-answer-who { font-weight: 800; color: #0f766e; font-size: 0.85rem; }
+        .aqa-empty { font-size: 0.875rem; color: #94a3b8; text-align: center; padding: 1rem 0; }
+        .aqa-msg { font-size: 0.82rem; color: #0f766e; margin-top: 0.45rem; }
+        .aqa-msg--err { color: #b91c1c; }
+        .aqa-msg--muted { color: #64748b; }
+        .aqa-upload-row { margin-top: 0.55rem; }
+        .aqa-upload-btn {
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            padding: 0.35rem 0.65rem; border-radius: 0.55rem;
+            border: 1px dashed #94a3b8; background: #fff; color: #475569;
+            font-size: 0.78rem; font-weight: 700; cursor: pointer;
+        }
+        .aqa-upload-btn:hover { border-color: #14b8a6; color: #0f766e; background: #f0fdfa; }
+        .aqa-upload-btn input { display: none; }
+        .aqa-img-preview { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.45rem; }
+        .aqa-img-thumb {
+            position: relative; width: 4.5rem; height: 4.5rem; border-radius: 0.55rem;
+            overflow: hidden; border: 1px solid #cbd5e1; background: #fff;
+        }
+        .aqa-img-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .aqa-img-gallery { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.55rem; }
+        .aqa-img-gallery a {
+            display: block; width: 5.5rem; height: 5.5rem; border-radius: 0.55rem;
+            overflow: hidden; border: 1px solid #cbd5e1; background: #fff;
+        }
+        .aqa-img-gallery img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .aqa-admin-link { margin-top: 0.85rem; background: #fff; }
+        /* 行政專區：問答工作區（左右分欄，列表固定高度捲動） */
+        .aqa-zone {
+            background: linear-gradient(135deg, #ccfbf1 0%, #fff 42%, #f8fafc 100%);
+            border: 1px solid #99f6e4;
+            border-radius: 1.5rem;
+            padding: 1rem 1.1rem 1.1rem;
+            box-shadow: 0 10px 30px rgba(13, 148, 136, 0.08);
+        }
+        .aqa-zone-head {
+            display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between;
+            gap: 0.65rem; margin-bottom: 0.75rem;
+        }
+        .aqa-zone-title { font-size: 1.45rem; font-weight: 900; color: #0f766e; margin: 0; }
+        .aqa-zone-actions { display: flex; flex-wrap: wrap; gap: 0.45rem; align-items: center; }
+        .aqa-rules-fold {
+            flex: 1 1 100%; background: rgba(255,255,255,0.72); border: 1px solid #99f6e4;
+            border-radius: 0.85rem; padding: 0.55rem 0.75rem;
+        }
+        .aqa-rules-fold summary {
+            cursor: pointer; font-size: 0.82rem; font-weight: 800; color: #0f766e; list-style: none;
+        }
+        .aqa-rules-fold summary::-webkit-details-marker { display: none; }
+        .aqa-rules-fold[open] summary { margin-bottom: 0.45rem; }
+        .aqa-zone-head--compact { margin-bottom: 0.55rem; }
+        .aqa-zone-head--compact .aqa-zone-title { font-size: 1.25rem; }
+        .admin-tools-fold { cursor: pointer; }
+        .admin-tools-fold summary {
+            cursor: pointer; list-style: none; font-size: 1rem; font-weight: 800; color: #334155;
+        }
+        .admin-tools-fold summary::-webkit-details-marker { display: none; }
+        .aqa-topbar {
+            display: flex; flex-direction: column; gap: 0.55rem;
+            margin-top: 0; margin-bottom: 0.65rem;
+        }
+        .aqa-topbar .aqa-stats { margin: 0; }
+        .aqa-topbar .aqa-rank { margin-top: 0; }
+        .aqa-rank-empty { font-size: 0.82rem; color: #94a3b8; text-align: center; padding: 0.65rem 0.5rem; }
+        .aqa-rules-panel {
+            background: rgba(255,255,255,0.72); border: 1px solid #99f6e4;
+            border-radius: 0.85rem; padding: 0.65rem 0.75rem; margin-bottom: 0.75rem;
+        }
+        .aqa-rules-heading {
+            font-size: 0.82rem; font-weight: 800; color: #0f766e; margin: 0 0 0.45rem;
+        }
+        .aqa-workspace {
+            display: grid; grid-template-columns: 1fr; gap: 0.75rem;
+            min-height: min(72vh, 720px);
+        }
+        @media (min-width: 900px) {
+            .aqa-workspace { grid-template-columns: minmax(16rem, 38%) minmax(0, 1fr); }
+        }
+        .aqa-sidebar, .aqa-main-panel {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 1rem;
+            padding: 0.85rem; min-height: 0; display: flex; flex-direction: column;
+        }
+        .aqa-ask-fold {
+            border: 1px solid #e2e8f0; border-radius: 0.85rem; padding: 0.55rem 0.65rem;
+            margin-bottom: 0.65rem; background: #f8fafc;
+        }
+        .aqa-ask-fold summary {
+            cursor: pointer; font-size: 0.88rem; font-weight: 800; color: #0f172a; list-style: none;
+        }
+        .aqa-ask-fold summary::-webkit-details-marker { display: none; }
+        .aqa-ask-fold[open] summary { margin-bottom: 0.55rem; }
+        .aqa-ask-fold .aqa-select { margin-top: 0.35rem; }
+        .aqa-list-panel { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+        .aqa-list-panel .aqa-section-title { margin-bottom: 0.45rem; font-size: 0.92rem; }
+        .aqa-list-scroll {
+            flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden;
+            padding-right: 0.15rem; margin-top: 0.35rem;
+        }
+        .aqa-list-scroll .aqa-list { padding-bottom: 0.25rem; }
+        .aqa-main-panel { overflow: hidden; }
+        .aqa-detail-pane {
+            flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden;
+        }
+        .aqa-detail-empty {
+            min-height: 12rem; display: flex; align-items: center; justify-content: center;
+            text-align: center; color: #94a3b8; font-size: 0.88rem; padding: 1.5rem 1rem;
+            border: 1px dashed #cbd5e1; border-radius: 0.85rem; background: #f8fafc;
+        }
+        .aqa-item--active {
+            border-color: #14b8a6 !important;
+            box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.18);
+            background: #f0fdfa;
+        }
+        .admin-tools-card {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 1.25rem;
+            padding: 1rem 1.15rem; box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+        }
+        .admin-tools-card--compact {
+            padding: 0.65rem 0.85rem; border-radius: 0.85rem;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+        }
+        .admin-tools-title { font-size: 1rem; font-weight: 800; color: #334155; margin-bottom: 0.65rem; }
+        .admin-tools-card--compact .admin-tools-title {
+            font-size: 0.82rem; margin-bottom: 0.45rem; color: #64748b;
+        }
+        .admin-tools-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .admin-tool-btn {
+            flex: 1 1 8rem; min-width: 0;
+            border: 1px solid #6ee7b7; background: #ecfdf5; color: #047857;
+            border-radius: 999px; padding: 0.35rem 0.75rem;
+            font-size: 0.78rem; font-weight: 700; cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .admin-tool-btn:hover { background: #d1fae5; border-color: #34d399; }
+        @media (max-width: 899px) {
+            .aqa-workspace.aqa-workspace--detail-open .aqa-sidebar { display: none; }
+            .aqa-workspace.aqa-workspace--detail-open .aqa-main-panel { min-height: min(70vh, 640px); }
+        }
+        .aqa-review-note {
+            margin-top: 0.55rem;
+            padding: 0.5rem 0.65rem;
+            border-radius: 0.55rem;
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            font-size: 0.82rem;
+            color: #78350f;
+            line-height: 1.45;
+        }
+        .aqa-review-note strong { font-weight: 800; }
         .nq-shell { padding: 0.25rem 0 1.5rem; }
         .nq-hero {
             border-radius: 1.25rem;
@@ -1368,8 +1687,7 @@
             transform: translateY(-2px);
             box-shadow: 0 22px 50px rgba(2, 6, 23, 0.11);
         }
-        .home-card-feedback {
-            border-style: dashed;
+        .home-card-administration {
             border-width: 2px;
             border-color: rgba(45, 212, 191, 0.5);
             background: linear-gradient(165deg, #ffffff 0%, #f0fdfa 46%, #ccfbf1 100%);
@@ -2679,7 +2997,7 @@
         .home-card-newbie::before { background-image: url("assets/illus-q-newbie.svg"); }
         .home-card-rentmgr::before { background-image: url("assets/illus-q-rentmgr.svg"); }
         .home-card-announce::before { background-image: url("assets/illus-q-announce.svg"); }
-        .home-card-feedback::before { background-image: url("assets/illus-q-feedback.svg"); }
+        .home-card-administration::before { background-image: url("assets/illus-q-feedback.svg"); }
         .home-feature-card p {
             color: var(--ink-muted);
             font-weight: 500;
@@ -3119,6 +3437,10 @@
                 <input id="toolbox-auth-password2" type="password" maxlength="72" autocomplete="new-password" placeholder="再輸入一次" />
                 <label for="toolbox-auth-displayname">姓名</label>
                 <input id="toolbox-auth-displayname" type="text" maxlength="30" autocomplete="nickname" placeholder="請輸入姓名" required />
+                <label for="toolbox-auth-team">處別</label>
+                <select id="toolbox-auth-team" required>
+                    <option value="">請選擇處別</option>
+                </select>
             </div>
             <button type="button" id="toolbox-auth-submit">進入工具箱</button>
             <p id="toolbox-auth-msg" class="hidden"></p>
@@ -3425,13 +3747,11 @@
                     <p class="text-slate-600 mt-3 text-center text-sm leading-relaxed">公司內部公告、簽呈與重要通知彙整。</p>
                 </div>
 
-                <div class="home-feature-card home-card-feedback">
-                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSdZES7NkG92YpgofUmN-8yCBBskyiqWxvkGto-BIFHBvJg5hQ/viewform?usp=publish-editor"
-                       target="_blank" rel="noopener noreferrer"
-                       class="btn btn-block btn-center btn-xl tone-teal no-underline">
-                        💬 意見專區
-                    </a>
-                    <p class="text-slate-600 mt-3 text-center text-sm leading-relaxed">開啟 Google 表單留下建議與回饋（新分頁）。</p>
+                <div class="home-feature-card home-card-administration">
+                    <button onclick="showPage('administration')" class="btn btn-block btn-center btn-xl tone-teal">
+                        🏛️ 行政專區
+                    </button>
+                    <p class="text-slate-600 mt-3 text-center text-sm leading-relaxed">解約退還與租金試算等行政工具。</p>
                 </div>
             </div>
         </div>
@@ -3663,6 +3983,127 @@
                 </div>
             </div>
         </div>
+
+        <!-- 專區頁面：行政（含行政問答） -->
+        <div id="page-administration" class="hidden max-w-6xl mx-auto space-y-5">
+            <button onclick="showPage('home')" class="mb-2 btn btn-sm tone-slate-soft">
+                ← 返回首頁
+            </button>
+
+            <section class="admin-tools-card admin-tools-card--compact" id="admin-tools-zone">
+                <h3 class="admin-tools-title">🧮 其他行政工具</h3>
+                <div class="admin-tools-grid">
+                    <button type="button" onclick="showPage('business-bao-deposit-refund')" class="admin-tool-btn">包租解約退還試算</button>
+                    <button type="button" onclick="showPage('business-deposit-refund')" class="admin-tool-btn">轉租解約退還試算</button>
+                    <button type="button" onclick="showPage('rent')" class="admin-tool-btn">租金水準試算</button>
+                </div>
+            </section>
+
+            <section class="aqa-zone" id="aqa-zone" aria-label="行政問答">
+                <div class="aqa-zone-head aqa-zone-head--compact">
+                    <h2 class="aqa-zone-title">💬 行政問答</h2>
+                    <div class="aqa-zone-actions">
+                        <a href="./admin/admin-qa-dashboard.html" target="_blank" rel="noopener noreferrer" class="aqa-admin-link ext-link-item no-underline" style="margin-top:0">
+                            <span class="ext-link-item__emoji" aria-hidden="true">✅</span>
+                            <span class="ext-link-item__label">檢核後台</span>
+                            <span class="ext-link-item__arrow" aria-hidden="true">↗</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="aqa-topbar">
+                    <div id="aqa-rank" class="aqa-rank">
+                        <div class="aqa-rank-head">
+                            <div class="aqa-rank-title">🏆 點數排行榜 TOP 3</div>
+                            <div class="aqa-rank-prizes">
+                                <span class="aqa-rank-prize aqa-rank-prize--1">🥇 第1名 1,000 元</span>
+                                <span class="aqa-rank-prize aqa-rank-prize--2">🥈 第2名 500 元</span>
+                                <span class="aqa-rank-prize aqa-rank-prize--3">🥉 第3名 300 元</span>
+                            </div>
+                        </div>
+                        <div class="aqa-rank-list">
+                            <p class="aqa-rank-empty">尚無排行榜資料，通過檢核後即可上榜。</p>
+                        </div>
+                    </div>
+                    <div id="aqa-stats" class="aqa-stats"></div>
+                </div>
+
+                <div class="aqa-rules-panel">
+                    <h3 class="aqa-rules-heading">📋 核心精神與計算規則</h3>
+                    <div class="aqa-hero-intro">
+                        <p class="aqa-hero-block">
+                            <span class="aqa-hero-label">核心精神</span>
+                            為了彙整大量行政問題、建立知識資料庫並訓練 AI 婷婷，讓日後常見問題可由 AI 即時回答，減輕同仁負擔，推動行政流程標準化。
+                        </p>
+                        <div class="aqa-hero-block">
+                            <span class="aqa-hero-label">計算規則</span>
+                            <ol class="aqa-hero-list">
+                                <li><span class="aqa-hero-num">1.</span>行政同仁可提問、互相回答；通過小組長檢核後，提問 1 點、回答 2 點</li>
+                                <li><span class="aqa-hero-num">2.</span>提問／回答<strong>認列</strong>各至多 50 點<br><span class="aqa-hero-sub">（超出部分不計入認列，但仍計入排行榜總點）</span></li>
+                                <li><span class="aqa-hero-num">3.</span>即使認列已達 50 點，仍可繼續累積排行榜點數、爭取前三名獎金。</li>
+                                <li><span class="aqa-hero-num">4.</span>婷婷當月認定為<strong>優質問題</strong>或<strong>優質回答</strong>，則該題或該則回答點數翻倍。</li>
+                                <li><span class="aqa-hero-num">5.</span>業績月以每月 <strong>29 日</strong>至<strong>次月 28 日</strong>計算；新業績月開始後，認列點數與排行榜點數<strong>歸零重新累計</strong>。</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="aqa-workspace" class="aqa-workspace">
+                    <aside class="aqa-sidebar">
+                        <details class="aqa-ask-fold" open>
+                            <summary>✏️ 我要提問</summary>
+                            <select id="aqa-ask-category" class="aqa-select" required>
+                                <option value="">請選擇問題分類（必填）</option>
+                                <option value="system">1. 系統問題</option>
+                                <option value="subsidy300">2. 300億問題</option>
+                                <option value="review">3. 審核問題</option>
+                                <option value="guild">4. 公會問題</option>
+                                <option value="other">5. 其他</option>
+                            </select>
+                            <input id="aqa-ask-title" type="text" class="aqa-input" maxlength="120" placeholder="問題標題（至少 4 字，必填）" />
+                            <textarea id="aqa-ask-body" class="aqa-textarea" rows="2" placeholder="補充說明（選填）"></textarea>
+                            <div class="aqa-upload-row">
+                                <label class="aqa-upload-btn">
+                                    <input id="aqa-ask-images" type="file" accept="image/jpeg,image/png,image/gif,image/webp" multiple />
+                                    📷 附加圖片（選填，最多 4 張）
+                                </label>
+                                <div id="aqa-ask-preview" class="aqa-img-preview"></div>
+                            </div>
+                            <button type="button" id="aqa-submit-ask" class="btn btn-sm btn-solid-emerald mt-2">送出問題</button>
+                            <p id="aqa-ask-msg" class="aqa-msg hidden"></p>
+                        </details>
+
+                        <div id="aqa-list-wrap" class="aqa-list-panel">
+                            <h3 class="aqa-section-title">問題列表</h3>
+                            <div class="aqa-filter-row">
+                                <select id="aqa-filter-category" class="aqa-select">
+                                    <option value="">全部分類</option>
+                                    <option value="system">1. 系統問題</option>
+                                    <option value="subsidy300">2. 300億問題</option>
+                                    <option value="review">3. 審核問題</option>
+                                    <option value="guild">4. 公會問題</option>
+                                    <option value="other">5. 其他</option>
+                                </select>
+                                <input id="aqa-search" type="search" class="aqa-input aqa-search" placeholder="關鍵字搜尋…" />
+                            </div>
+                            <p id="aqa-list-msg" class="aqa-msg aqa-msg--muted"></p>
+                            <div class="aqa-list-scroll">
+                                <div id="aqa-list" class="aqa-list"></div>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <main class="aqa-main-panel">
+                        <div id="aqa-detail" class="aqa-detail-pane">
+                            <div id="aqa-detail-empty" class="aqa-detail-empty">← 選擇左側問題查看詳情與回答</div>
+                        </div>
+                    </main>
+                </div>
+            </section>
+        </div>
+
+        <!-- 行政 QA（已併入行政專區，保留 id 供舊連結） -->
+        <div id="page-admin-qa" class="hidden" aria-hidden="true"></div>
 
         <!-- 房東專區：房屋稅課稅級距（點按鈕才顯示） -->
         <div id="page-landlord-house-tax" class="hidden max-w-4xl mx-auto space-y-6">
@@ -4500,9 +4941,9 @@
                                 <div class="rounded-xl border border-slate-200 bg-white p-4">
                                     <div class="font-bold text-slate-900 mb-2">房東需準備資料</div>
                                     <ul class="list-disc pl-5 space-y-1 text-sm">
-                                        <li>身分證</li>
+                                        <li>最新身分證</li>
                                         <li>最新一期房屋稅單</li>
-                                        <li>存摺</li>
+                                        <li>所有權人存摺</li>
                                         <li>手機號碼</li>
                                         <li>通訊地址</li>
                                     </ul>
@@ -4510,7 +4951,7 @@
                                 <div class="rounded-xl border border-slate-200 bg-white p-4">
                                     <div class="font-bold text-slate-900 mb-2">房客需準備資料</div>
                                     <ul class="list-disc pl-5 space-y-1 text-sm">
-                                        <li>身分證</li>
+                                        <li>最新身分證</li>
                                         <li>存摺</li>
                                         <li>一個月內戶籍謄本（記事不可省略）</li>
                                         <li>手機號碼</li>
@@ -8435,6 +8876,13 @@
             </div>
         </div>
 
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSdZES7NkG92YpgofUmN-8yCBBskyiqWxvkGto-BIFHBvJg5hQ/viewform?usp=publish-editor"
+           id="feedback-fab"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="feedback-fab no-underline"
+           title="開啟 Google 表單留下建議與回饋">💬 意見回饋</a>
+
         <script src="./js/vendor/pdf-lib.min.js"></script>
         <script src="./js/vendor/fontkit.umd.js"></script>
         <script src="./js/lal-template-b64.js"></script>
@@ -8448,13 +8896,14 @@
         <script src="./js/practice-tools.js"></script>
         <script src="./js/rentmgr-flow-guide.js"></script>
         <script src="./js/newbie-tools.js"></script>
+        <script src="./js/admin-qa.js"></script>
         <script src="./js/photo-guide-data.js"></script>
         <script src="./js/photo-guide-preview.js"></script>
         <script src="./js/nb-api-config.js"></script>
         <script src="./js/nb-api-base.js"></script>
         <script src="./js/skyfun-job-titles.js"></script>
         <script src="./js/skyfun-departments.js"></script>
-        <script src="./js/toolbox-auth.js?v=20260818-3"></script>
+        <script src="./js/toolbox-auth.js?v=20260905-2"></script>
 <script src="./js/lite-hide-api.js"></script>
 <script src="./js/site-file-search-index.js"></script>
         <script src="./js/tenant-eligibility-legal.js"></script>
@@ -9918,6 +10367,7 @@
             { page: 'newbie-quest', title: '業績任務板', category: '新人專區', keywords: '業績 任務板 打卡 新人 考核 kpi 追蹤 任務 新人任務' },
             { file: './admin/accounts-dashboard.html', title: '帳號管理後台', category: '管理工具', keywords: '後台 admin 帳號 開通 停用 登入紀錄 管理員' },
             { file: './admin/newbie-dashboard.html', title: '新人業績後台', category: '管理工具', keywords: '後台 admin 業績 任務 管理員 儀表板 dashboard KPI 新人' },
+            { file: './admin/admin-qa-dashboard.html', title: '行政 QA 檢核後台', category: '管理工具', keywords: '後台 admin 行政 問答 QA 檢核 點數 小組長' },
             { page: 'business-notary-fee', title: '租賃公證費試算', category: '業務專區', keywords: '公證 公證費 租賃公證 119條' },
             { page: 'business-forms', title: '各式表單', category: '業務專區', keywords: '表單 場勘 押金讓渡 領款收據 切結書 300億切結 115Y 自願撤案 帳戶變更 租金補貼' },
             { page: 'termination', title: '催收解約專區', category: '首頁專區', keywords: '催收 解約 退租 終止 退還 欠租 存證信函' },
@@ -9949,7 +10399,9 @@
             { page: 'practice-templates', title: '訊息範本產生器', category: '催收解約專區', keywords: 'line 範本 催繳 存證信函 提醒繳款 租金 國泰 帳戶 虛擬帳號 區域 身分證 電訪未接 逾期 桃園 新北 公司電話 宜蘭 基隆 雙北' },
             { page: 'practice-contacts', title: '租金補貼辦理單位', category: '房客專區', keywords: '窗口 通訊錄 300億 租金補貼 辦理單位 縣市 電話 傳真 臨櫃 pip' },
             { page: 'announcement', title: '簽呈公告專區', category: '首頁專區', keywords: '簽呈 公告 通知 公司' },
-            { external: 'https://docs.google.com/forms/d/e/1FAIpQLSdZES7NkG92YpgofUmN-8yCBBskyiqWxvkGto-BIFHBvJg5hQ/viewform?usp=publish-editor', title: '意見專區', category: '首頁專區', keywords: '意見 回饋 表單 feedback' },
+            { page: 'administration', title: '行政專區', category: '首頁專區', keywords: '行政 請款 天數 庶務 管理部 包租解約 轉租解約 租金試算 租金水準 問答 QA' },
+            { page: 'admin-qa', title: '行政問答 QA', category: '行政專區', keywords: '行政 問答 QA 提問 回答 點數 關鍵字 搜尋 小組長 檢核' },
+            { external: 'https://docs.google.com/forms/d/e/1FAIpQLSdZES7NkG92YpgofUmN-8yCBBskyiqWxvkGto-BIFHBvJg5hQ/viewform?usp=publish-editor', title: '意見回饋', category: '全站', keywords: '意見 回饋 表單 feedback 建議' },
             { external: 'https://skyfunsystem.com/Home/Login', title: '星鴻系統', category: '外部連結', keywords: '星鴻 系統 登入 skyfun' },
             { external: 'https://onlinealarmkur.com/date/zh-tw/', title: '天數計算器', category: '外部連結', keywords: '天數 日期 計算' },
             { external: 'https://lvr.land.moi.gov.tw/', title: '實價登錄查詢系統', category: '外部連結', keywords: '實價登錄 時價登錄 成交 內政部 lvr 買賣 租賃 預售' },
@@ -9980,6 +10432,8 @@
             'rentmanager-links': 'page-rentmanager-links',
             'rentmanager-crossarea-bonus': 'page-rentmanager-crossarea-bonus',
             announcement: 'page-announcement',
+            administration: 'page-administration',
+            'admin-qa': 'page-administration',
             'newbie-business': 'page-newbie-business',
             'newbie-rentmgr': 'page-newbie-rentmgr',
             'newbie-roadmap': 'page-newbie-roadmap',
@@ -10026,7 +10480,7 @@
             'page-business-income-standards', 'page-business-notary-fee', 'page-business-deposit-refund',
             'page-business-bao-deposit-refund', 'page-business-forms', 'page-termination',
             'page-rentmanager', 'page-rentmanager-links', 'page-rentmanager-crossarea-bonus',
-            'page-announcement', 'page-newbie', 'page-calculator', 'page-rent',
+            'page-announcement', 'page-administration', 'page-admin-qa', 'page-newbie', 'page-calculator', 'page-rent',
             'page-practice-timeline', 'page-collection-case', 'page-mediation-flow', 'page-practice-templates', 'page-practice-contacts', 'page-lal-generator', 'page-care-visit-notice'
         ];
 
@@ -10144,6 +10598,9 @@
             }
             if (pageName === 'newbie-quest' && typeof window.nbQuestInit === 'function') {
                 window.nbQuestInit();
+            }
+            if ((pageName === 'administration' || pageName === 'admin-qa') && typeof window.adminQaInit === 'function') {
+                window.adminQaInit();
             }
             if (pageName === 'rentmanager') {
                 if (typeof window.initReceiptEndorsementForm === 'function') window.initReceiptEndorsementForm();
