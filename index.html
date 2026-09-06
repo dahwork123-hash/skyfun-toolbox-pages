@@ -904,6 +904,12 @@
         .aqa-ask-fold summary::-webkit-details-marker { display: none; }
         .aqa-ask-fold[open] summary { margin-bottom: 0.55rem; }
         .aqa-ask-fold .aqa-select { margin-top: 0.35rem; }
+        .aqa-participation-notice, .aqa-participation-note {
+            padding: 0.65rem 0.75rem; border-radius: 0.65rem; background: #f8fafc; border: 1px solid #cbd5e1;
+            font-size: 0.82rem; color: #475569; line-height: 1.5;
+        }
+        .aqa-participation-notice { margin-bottom: 0.65rem; }
+        .aqa-participation-notice p, .aqa-participation-note { margin: 0; }
         .aqa-list-panel { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
         .aqa-list-panel .aqa-section-title { margin-bottom: 0.45rem; font-size: 0.92rem; }
         .aqa-list-scroll {
@@ -4038,11 +4044,12 @@
                         <div class="aqa-hero-block">
                             <span class="aqa-hero-label">計算規則</span>
                             <ol class="aqa-hero-list">
-                                <li><span class="aqa-hero-num">1.</span>行政同仁可提問、互相回答；通過小組長檢核後，提問 1 點、回答 2 點</li>
-                                <li><span class="aqa-hero-num">2.</span>提問／回答<strong>認列</strong>各至多 50 點<br><span class="aqa-hero-sub">（超出部分不計入認列，但仍計入排行榜總點）</span></li>
-                                <li><span class="aqa-hero-num">3.</span>即使認列已達 50 點，仍可繼續累積排行榜點數、爭取前三名獎金。</li>
-                                <li><span class="aqa-hero-num">4.</span>婷婷當月認定為<strong>優質問題</strong>或<strong>優質回答</strong>，則該題或該則回答點數翻倍。</li>
-                                <li><span class="aqa-hero-num">5.</span>業績月以每月 <strong>29 日</strong>至<strong>次月 28 日</strong>計算；新業績月開始後，認列點數與排行榜點數<strong>歸零重新累計</strong>。</li>
+                                <li><span class="aqa-hero-num">1.</span>僅<strong>行政管理部</strong>同仁可提問與回答；其他部門可瀏覽問題與回答。</li>
+                                <li><span class="aqa-hero-num">2.</span>行政同仁可提問、互相回答；通過小組長檢核後，提問 1 點、回答 2 點</li>
+                                <li><span class="aqa-hero-num">3.</span>提問／回答<strong>認列</strong>各至多 50 點<br><span class="aqa-hero-sub">（超出部分不計入認列，但仍計入排行榜總點）</span></li>
+                                <li><span class="aqa-hero-num">4.</span>即使認列已達 50 點，仍可繼續累積排行榜點數、爭取前三名獎金。</li>
+                                <li><span class="aqa-hero-num">5.</span>婷婷當月認定為<strong>優質問題</strong>或<strong>優質回答</strong>，則該題或該則回答點數翻倍。</li>
+                                <li><span class="aqa-hero-num">6.</span>業績月以每月 <strong>29 日</strong>至<strong>次月 28 日</strong>計算；新業績月開始後，認列點數與排行榜點數<strong>歸零重新累計</strong>。</li>
                             </ol>
                         </div>
                     </div>
@@ -4072,6 +4079,10 @@
                             <button type="button" id="aqa-submit-ask" class="btn btn-sm btn-solid-emerald mt-2">送出問題</button>
                             <p id="aqa-ask-msg" class="aqa-msg hidden"></p>
                         </details>
+
+                        <div id="aqa-participation-notice" class="aqa-participation-notice hidden">
+                            <p>提問與回答僅限<strong>行政管理部</strong>同仁使用，您仍可瀏覽問題與回答。</p>
+                        </div>
 
                         <div id="aqa-list-wrap" class="aqa-list-panel">
                             <h3 class="aqa-section-title">問題列表</h3>

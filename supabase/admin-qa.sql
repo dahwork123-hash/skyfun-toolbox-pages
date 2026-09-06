@@ -88,6 +88,21 @@ begin
 end;
 $$;
 
+create or replace function public.admin_qa_can_participate(p_user_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select coalesce(
+    (select trim(coalesce(team, '')) = '行政管理部'
+     from public.toolbox_accounts
+     where id = p_user_id),
+    false
+  );
+$$;
+
 create or replace function public.admin_qa_period_start(p_at timestamptz default now())
 returns timestamptz
 language plpgsql
@@ -234,6 +249,9 @@ begin
   v_uid := admin_qa_user_id(p_token);
   if v_uid is null then
     return json_build_object('ok', false, 'error', '請先登入');
+  end if;
+  if not admin_qa_can_participate(v_uid) then
+    return json_build_object('ok', false, 'error', '僅行政管理部同仁可提問與回答');
   end if;
   v_ext := lower(trim(coalesce(p_ext, 'jpg')));
   v_ext := regexp_replace(v_ext, '[^a-z0-9]', '', 'g');
@@ -412,6 +430,9 @@ begin
   if v_uid is null then
     return json_build_object('ok', false, 'error', '請先登入');
   end if;
+  if not admin_qa_can_participate(v_uid) then
+    return json_build_object('ok', false, 'error', '僅行政管理部同仁可提問與回答');
+  end if;
   v_title := trim(coalesce(p_title, ''));
   v_body := trim(coalesce(p_body, ''));
   if length(v_title) < 4 then
@@ -463,6 +484,9 @@ begin
   v_uid := admin_qa_user_id(p_token);
   if v_uid is null then
     return json_build_object('ok', false, 'error', '請先登入');
+  end if;
+  if not admin_qa_can_participate(v_uid) then
+    return json_build_object('ok', false, 'error', '僅行政管理部同仁可提問與回答');
   end if;
   v_body := trim(coalesce(p_body, ''));
   if length(v_body) < 4 then
@@ -520,6 +544,7 @@ begin
   v_ans := admin_qa_user_points(v_uid, 'answer');
   return json_build_object(
     'ok', true,
+    'canParticipate', admin_qa_can_participate(v_uid),
     'periodFrom', to_char(v_start at time zone 'Asia/Taipei', 'YYYY/MM/DD'),
     'periodTo', to_char(v_end, 'YYYY/MM/DD'),
     'askPoints', least(v_ask, 50),

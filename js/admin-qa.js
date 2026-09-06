@@ -18,6 +18,20 @@
   let currentQuestionId = null;
   let sbClient = null;
   let aqaInited = false;
+  let canParticipate = false;
+  const ADMIN_QA_TEAM = '行政管理部';
+
+  function syncParticipationFromUser() {
+    const team = String(window.ToolboxAuth?.getUser?.()?.team || '').trim();
+    if (team) canParticipate = team === ADMIN_QA_TEAM;
+  }
+
+  function applyParticipationUI() {
+    const askFold = document.querySelector('.aqa-ask-fold');
+    const notice = $('aqa-participation-notice');
+    if (askFold) askFold.classList.toggle('hidden', !canParticipate);
+    if (notice) notice.classList.toggle('hidden', canParticipate);
+  }
 
   function isAqaSplit() {
     return window.matchMedia('(min-width: 900px)').matches;
@@ -226,6 +240,8 @@
     try {
       const data = await rpc('admin_qa_my_stats', { p_token: token() });
       if (!data?.ok) throw new Error(data?.error || '讀取失敗');
+      canParticipate = !!data.canParticipate;
+      applyParticipationUI();
       el.innerHTML =
         periodLabel(data.periodFrom, data.periodTo) +
         '<div class="aqa-stat"><strong>提問認列</strong><span>' + esc(data.askPoints) + ' / ' + esc(data.askCap) + '</span></div>' +
@@ -404,29 +420,41 @@
             }).join('')
           : '<p class="aqa-empty">尚無回答，歡迎行政同仁協助解答。</p>') +
         '</section>' +
-        '<section class="aqa-reply-form">' +
-        '<h4 class="aqa-section-title">我要回答</h4>' +
-        '<textarea id="aqa-answer-body" class="aqa-textarea" rows="4" placeholder="輸入你的回答（必填，至少 4 字）…"></textarea>' +
-        '<div class="aqa-upload-row">' +
-        '<label class="aqa-upload-btn">' +
-        '<input id="aqa-answer-images" type="file" accept="image/jpeg,image/png,image/gif,image/webp" multiple />' +
-        '📷 附加圖片（選填，最多 4 張）' +
-        '</label>' +
-        '<div id="aqa-answer-preview" class="aqa-img-preview"></div>' +
-        '</div>' +
-        '<button type="button" id="aqa-submit-answer" class="btn btn-sm btn-solid-emerald mt-2">送出回答</button>' +
-        '<p id="aqa-answer-msg" class="aqa-msg hidden"></p>' +
-        '</section>';
+        (canParticipate
+          ? '<section class="aqa-reply-form">' +
+            '<h4 class="aqa-section-title">我要回答</h4>' +
+            '<textarea id="aqa-answer-body" class="aqa-textarea" rows="4" placeholder="輸入你的回答（必填，至少 4 字）…"></textarea>' +
+            '<div class="aqa-upload-row">' +
+            '<label class="aqa-upload-btn">' +
+            '<input id="aqa-answer-images" type="file" accept="image/jpeg,image/png,image/gif,image/webp" multiple />' +
+            '📷 附加圖片（選填，最多 4 張）' +
+            '</label>' +
+            '<div id="aqa-answer-preview" class="aqa-img-preview"></div>' +
+            '</div>' +
+            '<button type="button" id="aqa-submit-answer" class="btn btn-sm btn-solid-emerald mt-2">送出回答</button>' +
+            '<p id="aqa-answer-msg" class="aqa-msg hidden"></p>' +
+            '</section>'
+          : '<p class="aqa-participation-note">提問與回答僅限<strong>行政管理部</strong>同仁，您目前可瀏覽問題與回答。</p>');
 
       $('aqa-back-list')?.addEventListener('click', closeDetail);
-      bindImagePicker('aqa-answer-images', 'aqa-answer-preview');
-      $('aqa-submit-answer')?.addEventListener('click', submitAnswer);
+      if (canParticipate) {
+        bindImagePicker('aqa-answer-images', 'aqa-answer-preview');
+        $('aqa-submit-answer')?.addEventListener('click', submitAnswer);
+      }
     } catch (err) {
       detail.innerHTML = '<p class="aqa-msg aqa-msg--err">' + esc(err.message || err) + '</p>';
     }
   }
 
   async function submitAsk() {
+    if (!canParticipate) {
+      const msg = $('aqa-ask-msg');
+      if (msg) {
+        msg.textContent = '僅行政管理部同仁可提問';
+        msg.classList.remove('hidden');
+      }
+      return;
+    }
     const category = ($('aqa-ask-category')?.value || '').trim();
     const title = ($('aqa-ask-title')?.value || '').trim();
     const body = ($('aqa-ask-body')?.value || '').trim();
@@ -478,6 +506,15 @@
   }
 
   async function submitAnswer() {
+    if (!canParticipate) {
+      const msg = $('aqa-answer-msg');
+      if (msg) {
+        msg.textContent = '僅行政管理部同仁可回答';
+        msg.classList.remove('hidden');
+        msg.classList.add('aqa-msg--err');
+      }
+      return;
+    }
     if (!currentQuestionId) return;
     const body = ($('aqa-answer-body')?.value || '').trim();
     const msg = $('aqa-answer-msg');
@@ -546,6 +583,8 @@
       bindEvents();
       aqaInited = true;
     }
+    syncParticipationFromUser();
+    applyParticipationUI();
     loadStats();
     loadLeaderboard();
     loadList('', '');
