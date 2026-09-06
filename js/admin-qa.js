@@ -698,11 +698,17 @@
       bindEvents();
       aqaInited = true;
     }
+    canParticipate = false;
+    applyParticipationUI();
     syncParticipationFromUser();
     applyParticipationUI();
-    loadStats();
-    loadLeaderboard();
-    loadList('', '');
+    loadStats().then(function () {
+      loadLeaderboard();
+      loadList('', '');
+    }).catch(function () {
+      loadLeaderboard();
+      loadList('', '');
+    });
     closeDetail();
   }
 
