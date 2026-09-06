@@ -15,6 +15,7 @@ create table if not exists public.admin_qa_questions (
   category text not null default 'other'
     check (category in ('system', 'subsidy300', 'review', 'guild', 'other')),
   images text[] not null default '{}',
+  files text[] not null default '{}',
   created_at timestamptz not null default now()
 );
 
@@ -34,6 +35,7 @@ create table if not exists public.admin_qa_answers (
   reviewed_at timestamptz,
   review_note text,
   images text[] not null default '{}',
+  files text[] not null default '{}',
   created_at timestamptz not null default now()
 );
 
@@ -234,6 +236,49 @@ begin
 end;
 $$;
 
+create or replace function public.admin_qa_validate_files(p_user_id uuid, p_files text[])
+returns text[]
+language plpgsql
+stable
+security definer
+set search_path = public
+as $$
+declare
+  v_base text := 'https://xpbownhiedurytlyqszu.supabase.co/storage/v1/object/public/admin-qa-files/';
+  v_prefix text;
+  v_file text;
+  v_out text[] := '{}';
+  v_cnt int;
+  v_ext text;
+begin
+  v_prefix := p_user_id::text || '/';
+  v_cnt := coalesce(array_length(p_files, 1), 0);
+  if v_cnt > 4 then
+    raise exception '最多 4 個檔案';
+  end if;
+  if v_cnt = 0 then
+    return v_out;
+  end if;
+  foreach v_file in array coalesce(p_files, '{}')
+  loop
+    v_file := trim(coalesce(v_file, ''));
+    if v_file = '' then continue; end if;
+    if not v_file like v_base || '%' then
+      raise exception '檔案網址無效';
+    end if;
+    if not replace(v_file, v_base, '') like v_prefix || '%' then
+      raise exception '檔案必須由本人上傳';
+    end if;
+    v_ext := lower(regexp_replace(v_file, '.*\\.', ''));
+    if v_ext not in ('pdf','doc','docx','xls','xlsx','ppt','pptx','zip','rar','7z','txt','csv') then
+      raise exception '不支援的檔案格式';
+    end if;
+    v_out := array_append(v_out, v_file);
+  end loop;
+  return v_out;
+end;
+$$;
+
 create or replace function public.admin_qa_prepare_upload(p_token text, p_ext text)
 returns json
 language plpgsql
@@ -257,6 +302,39 @@ begin
   v_ext := regexp_replace(v_ext, '[^a-z0-9]', '', 'g');
   if v_ext not in ('jpg', 'jpeg', 'png', 'gif', 'webp') then
     v_ext := 'jpg';
+  end if;
+  v_path := v_uid::text || '/' || gen_random_uuid()::text || '.' || v_ext;
+  return json_build_object(
+    'ok', true,
+    'path', v_path,
+    'publicUrl', v_base || v_path
+  );
+end;
+$$;
+
+create or replace function public.admin_qa_prepare_file_upload(p_token text, p_ext text)
+returns json
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_uid uuid;
+  v_ext text;
+  v_path text;
+  v_base text := 'https://xpbownhiedurytlyqszu.supabase.co/storage/v1/object/public/admin-qa-files/';
+begin
+  v_uid := admin_qa_user_id(p_token);
+  if v_uid is null then
+    return json_build_object('ok', false, 'error', '請先登入');
+  end if;
+  if not admin_qa_can_participate(v_uid) then
+    return json_build_object('ok', false, 'error', '僅行政管理部同仁可提問與回答');
+  end if;
+  v_ext := lower(trim(coalesce(p_ext, 'pdf')));
+  v_ext := regexp_replace(v_ext, '[^a-z0-9]', '', 'g');
+  if v_ext not in ('pdf','doc','docx','xls','xlsx','ppt','pptx','zip','rar','7z','txt','csv') then
+    return json_build_object('ok', false, 'error', '不支援的檔案格式');
   end if;
   v_path := v_uid::text || '/' || gen_random_uuid()::text || '.' || v_ext;
   return json_build_object(
@@ -378,6 +456,7 @@ begin
           asker_name as "askerName",
           created_at as "createdAt",
           coalesce(images, '{}'::text[]) as images,
+          coalesce(files, '{}'::text[]) as files,
           admin_qa_is_double_points(asker_id) as "isDoublePoints"
         from public.admin_qa_questions
         where id = p_question_id
@@ -393,6 +472,7 @@ begin
           review_note as "reviewNote",
           created_at as "createdAt",
           coalesce(images, '{}'::text[]) as images,
+          coalesce(files, '{}'::text[]) as files,
           admin_qa_is_double_points(answerer_id) as "isDoublePoints"
         from public.admin_qa_answers
         where question_id = p_question_id
@@ -410,7 +490,8 @@ create or replace function public.admin_qa_ask(
   p_title text,
   p_body text default '',
   p_images text[] default '{}',
-  p_category text default ''
+  p_category text default '',
+  p_files text[] default '{}'
 )
 returns json
 language plpgsql
@@ -424,6 +505,7 @@ declare
   v_title text;
   v_body text;
   v_images text[];
+  v_files text[];
   v_category text;
 begin
   v_uid := admin_qa_user_id(p_token);
@@ -448,11 +530,16 @@ begin
   exception when others then
     return json_build_object('ok', false, 'error', SQLERRM);
   end;
+  begin
+    v_files := admin_qa_validate_files(v_uid, coalesce(p_files, '{}'));
+  exception when others then
+    return json_build_object('ok', false, 'error', SQLERRM);
+  end;
   select coalesce(nullif(name, ''), username, '') into v_name
   from public.toolbox_accounts where id = v_uid;
 
-  insert into public.admin_qa_questions(asker_id, asker_name, title, body, images, category)
-  values (v_uid, v_name, v_title, v_body, v_images, v_category)
+  insert into public.admin_qa_questions(asker_id, asker_name, title, body, images, files, category)
+  values (v_uid, v_name, v_title, v_body, v_images, v_files, v_category)
   returning id into v_id;
 
   return json_build_object(
@@ -467,7 +554,8 @@ create or replace function public.admin_qa_answer(
   p_token text,
   p_question_id uuid,
   p_body text,
-  p_images text[] default '{}'
+  p_images text[] default '{}',
+  p_files text[] default '{}'
 )
 returns json
 language plpgsql
@@ -480,6 +568,7 @@ declare
   v_id uuid;
   v_body text;
   v_images text[];
+  v_files text[];
 begin
   v_uid := admin_qa_user_id(p_token);
   if v_uid is null then
@@ -500,11 +589,16 @@ begin
   exception when others then
     return json_build_object('ok', false, 'error', SQLERRM);
   end;
+  begin
+    v_files := admin_qa_validate_files(v_uid, coalesce(p_files, '{}'));
+  exception when others then
+    return json_build_object('ok', false, 'error', SQLERRM);
+  end;
   select coalesce(nullif(name, ''), username, '') into v_name
   from public.toolbox_accounts where id = v_uid;
 
-  insert into public.admin_qa_answers(question_id, answerer_id, answerer_name, body, images)
-  values (p_question_id, v_uid, v_name, v_body, v_images)
+  insert into public.admin_qa_answers(question_id, answerer_id, answerer_name, body, images, files)
+  values (p_question_id, v_uid, v_name, v_body, v_images, v_files)
   returning id into v_id;
 
   update public.admin_qa_questions
@@ -1035,6 +1129,8 @@ grant execute on function public.admin_qa_admin_delete_question(text, uuid) to a
 grant execute on function public.admin_qa_admin_points_report(text, text, text) to anon, authenticated;
 grant execute on function public.admin_qa_leaderboard(text) to anon, authenticated;
 grant execute on function public.admin_qa_prepare_upload(text, text) to anon, authenticated;
+grant execute on function public.admin_qa_prepare_file_upload(text, text) to anon, authenticated;
+grant execute on function public.admin_qa_validate_files(uuid, text[]) to anon, authenticated;
 grant execute on function public.admin_qa_ask(text, text, text, text[]) to anon, authenticated;
 grant execute on function public.admin_qa_answer(text, uuid, text, text[]) to anon, authenticated;
 grant execute on function public.toolbox_admin_set_qa_double(text, uuid, boolean) to anon, authenticated;

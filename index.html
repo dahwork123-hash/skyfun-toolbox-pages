@@ -838,6 +838,15 @@
             overflow: hidden; border: 1px solid #cbd5e1; background: #fff;
         }
         .aqa-img-gallery img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .aqa-file-preview { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.45rem; }
+        .aqa-file-chip {
+            display: inline-flex; align-items: center; max-width: 100%;
+            padding: 0.28rem 0.55rem; border-radius: 999px; border: 1px solid #cbd5e1;
+            background: #fff; color: #334155; font-size: 0.72rem; font-weight: 700;
+        }
+        .aqa-file-list { list-style: none; margin: 0.55rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+        .aqa-file-list a { color: #0f766e; font-size: 0.82rem; font-weight: 700; text-decoration: none; }
+        .aqa-file-list a:hover { text-decoration: underline; }
         .aqa-admin-link { margin-top: 0.85rem; background: #fff; }
         /* 行政專區：問答工作區（左右分欄，列表固定高度捲動） */
         .aqa-zone {
@@ -4075,6 +4084,13 @@
                                     📷 附加圖片（選填，最多 4 張）
                                 </label>
                                 <div id="aqa-ask-preview" class="aqa-img-preview"></div>
+                            </div>
+                            <div class="aqa-upload-row">
+                                <label class="aqa-upload-btn">
+                                    <input id="aqa-ask-files" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.7z,.txt,.csv" multiple />
+                                    📎 附加檔案（選填，最多 4 個，單檔 10MB）
+                                </label>
+                                <div id="aqa-ask-files-preview" class="aqa-file-preview"></div>
                             </div>
                             <button type="button" id="aqa-submit-ask" class="btn btn-sm btn-solid-emerald mt-2">送出問題</button>
                             <p id="aqa-ask-msg" class="aqa-msg hidden"></p>

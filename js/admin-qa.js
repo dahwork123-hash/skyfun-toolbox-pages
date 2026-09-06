@@ -6,7 +6,26 @@
 
   const DEBOUNCE_MS = 320;
   const MAX_IMAGES = 4;
+  const MAX_FILES = 4;
   const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+  const MAX_FILE_BYTES = 10 * 1024 * 1024;
+  const FILE_ACCEPT = '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.7z,.txt,.csv';
+  const FILE_MIME = {
+    'application/pdf': 'pdf',
+    'application/msword': 'doc',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+    'application/vnd.ms-excel': 'xls',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
+    'application/vnd.ms-powerpoint': 'ppt',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'pptx',
+    'application/zip': 'zip',
+    'application/x-zip-compressed': 'zip',
+    'application/x-rar-compressed': 'rar',
+    'application/vnd.rar': 'rar',
+    'application/x-7z-compressed': '7z',
+    'text/plain': 'txt',
+    'text/csv': 'csv',
+  };
   const CATEGORY_LABELS = {
     system: '系統問題',
     subsidy300: '300億問題',
@@ -134,6 +153,46 @@
     );
   }
 
+  function filesHtml(files) {
+    const list = Array.isArray(files) ? files.filter(Boolean) : [];
+    if (!list.length) return '';
+    return (
+      '<ul class="aqa-file-list">' +
+      list.map(function (url, i) {
+        const name = fileLabelFromUrl(url, i);
+        return (
+          '<li><a href="' + esc(url) + '" target="_blank" rel="noopener noreferrer" download>' +
+          '📎 ' + esc(name) +
+          '</a></li>'
+        );
+      }).join('') +
+      '</ul>'
+    );
+  }
+
+  function attachmentsHtml(images, files) {
+    return imagesHtml(images) + filesHtml(files);
+  }
+
+  function fileLabelFromUrl(url, index) {
+    const raw = String(url || '').split('/').pop() || '';
+    const decoded = decodeURIComponent(raw);
+    if (decoded && decoded.includes('.')) return decoded;
+    return '附件 ' + ((index || 0) + 1);
+  }
+
+  function isImageFile(file) {
+    return String(file?.type || '').startsWith('image/');
+  }
+
+  function attachmentFileExt(name, type) {
+    const fromName = String(name || '').split('.').pop() || '';
+    const clean = fromName.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const allowed = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'zip', 'rar', '7z', 'txt', 'csv'];
+    if (allowed.includes(clean)) return clean;
+    return FILE_MIME[type] || '';
+  }
+
   async function rpc(name, args) {
     const auth = window.skyfunAuth;
     if (!auth?.rpc) throw new Error('請先登入工具箱');
@@ -169,64 +228,96 @@
     return map[type] || 'jpg';
   }
 
-  function renderFilePreview(input, previewEl) {
+  function renderAttachmentPreview(input, previewEl, kind) {
     if (!input || !previewEl) return;
     previewEl.innerHTML = '';
-    const files = Array.from(input.files || []).slice(0, MAX_IMAGES);
-    files.forEach(function (file) {
+    const max = kind === 'image' ? MAX_IMAGES : MAX_FILES;
+    Array.from(input.files || []).slice(0, max).forEach(function (file) {
       const wrap = document.createElement('div');
-      wrap.className = 'aqa-img-thumb';
-      const img = document.createElement('img');
-      img.alt = file.name;
-      img.src = URL.createObjectURL(file);
-      wrap.appendChild(img);
+      wrap.className = kind === 'image' ? 'aqa-img-thumb' : 'aqa-file-chip';
+      if (kind === 'image') {
+        const img = document.createElement('img');
+        img.alt = file.name;
+        img.src = URL.createObjectURL(file);
+        wrap.appendChild(img);
+      } else {
+        wrap.textContent = '📎 ' + file.name;
+      }
       previewEl.appendChild(wrap);
     });
   }
 
-  function bindImagePicker(inputId, previewId) {
+  function bindAttachmentPicker(inputId, previewId, kind) {
     const input = $(inputId);
     const preview = $(previewId);
     if (!input || input.dataset.aqaBound) return;
     input.dataset.aqaBound = '1';
     input.addEventListener('change', function () {
-      if (input.files && input.files.length > MAX_IMAGES) {
-        alert('最多只能選 ' + MAX_IMAGES + ' 張圖片');
+      const max = kind === 'image' ? MAX_IMAGES : MAX_FILES;
+      if (input.files && input.files.length > max) {
+        alert('最多只能選 ' + max + (kind === 'image' ? ' 張圖片' : ' 個檔案'));
       }
-      renderFilePreview(input, preview);
+      renderAttachmentPreview(input, preview, kind);
     });
   }
 
-  function clearImagePicker(inputId, previewId) {
+  function clearAttachmentPicker(inputId, previewId) {
     const input = $(inputId);
     const preview = $(previewId);
     if (input) input.value = '';
     if (preview) preview.innerHTML = '';
   }
 
-  async function uploadImages(input) {
-    const files = Array.from(input?.files || []).slice(0, MAX_IMAGES);
+  async function uploadAttachments(input, kind) {
+    const bucket = kind === 'image' ? 'admin-qa-images' : 'admin-qa-files';
+    const rpcName = kind === 'image' ? 'admin_qa_prepare_upload' : 'admin_qa_prepare_file_upload';
+    const max = kind === 'image' ? MAX_IMAGES : MAX_FILES;
+    const maxBytes = kind === 'image' ? MAX_IMAGE_BYTES : MAX_FILE_BYTES;
+    const files = Array.from(input?.files || []).slice(0, max);
     if (!files.length) return [];
     const sb = getSb();
     const urls = [];
     for (const file of files) {
-      if (!file.type.startsWith('image/')) {
-        throw new Error('僅支援 JPG、PNG、GIF、WEBP 圖片');
+      if (kind === 'image') {
+        if (!isImageFile(file)) throw new Error('僅支援 JPG、PNG、GIF、WEBP 圖片');
+      } else if (isImageFile(file)) {
+        throw new Error('圖片請使用「附加圖片」，檔案請選 PDF、Word、Excel 等文件');
       }
-      if (file.size > MAX_IMAGE_BYTES) {
-        throw new Error('單張圖片不可超過 5MB');
+      if (file.size > maxBytes) {
+        throw new Error((kind === 'image' ? '單張圖片' : '單一檔案') + '不可超過 ' + (maxBytes / (1024 * 1024)) + 'MB');
       }
-      const ext = fileExt(file.name, file.type);
-      const prep = await rpc('admin_qa_prepare_upload', { p_token: token(), p_ext: ext });
+      const ext = kind === 'image' ? fileExt(file.name, file.type) : attachmentFileExt(file.name, file.type);
+      if (!ext) throw new Error('不支援的檔案格式：' + (file.name || ''));
+      const prep = await rpc(rpcName, { p_token: token(), p_ext: ext });
       if (!prep?.ok) throw new Error(prep?.error || '無法準備上傳');
-      const { error } = await sb.storage.from('admin-qa-images').upload(prep.path, file, {
-        contentType: file.type || 'image/jpeg',
+      const { error } = await sb.storage.from(bucket).upload(prep.path, file, {
+        contentType: file.type || (kind === 'image' ? 'image/jpeg' : 'application/octet-stream'),
         upsert: false,
       });
-      if (error) throw new Error(error.message || '圖片上傳失敗');
+      if (error) throw new Error(error.message || '上傳失敗');
       urls.push(prep.publicUrl);
     }
     return urls;
+  }
+
+  function renderFilePreview(input, previewEl) {
+    renderAttachmentPreview(input, previewEl, 'image');
+  }
+
+  function bindImagePicker(inputId, previewId) {
+    bindAttachmentPicker(inputId, previewId, 'image');
+  }
+
+  function clearImagePicker(inputId, previewId) {
+    clearAttachmentPicker(inputId, previewId);
+  }
+
+  async function uploadImages(input) {
+    return uploadAttachments(input, 'image');
+  }
+
+  async function uploadFiles(input) {
+    return uploadAttachments(input, 'file');
   }
 
   function periodLabel(from, to) {
@@ -309,6 +400,7 @@
     }
     list.innerHTML = items.map(function (it) {
       const hasImg = Array.isArray(it.images) && it.images.length;
+      const hasFile = Array.isArray(it.files) && it.files.length;
       const qClass = itemQualityClass(it.isQuality, it.hasQualityAnswer);
       return (
         '<button type="button" class="aqa-item' + qClass + '" data-id="' + esc(it.id) + '">' +
@@ -320,7 +412,7 @@
         '</div>' +
         '<p class="aqa-item-meta">' + categoryBadge(it.category) +
         '<span class="aqa-role aqa-role--ask">提問</span> ' + esc(it.askerName) + ' · ' + esc(fmtDate(it.createdAt)) +
-        ' · 回答 ' + esc(it.answerCount || 0) + ' 則' + (hasImg ? ' · 📷' : '') + '</p>' +
+        ' · 回答 ' + esc(it.answerCount || 0) + ' 則' + (hasImg ? ' · 📷' : '') + (hasFile ? ' · 📎' : '') + '</p>' +
         '</button>'
       );
     }).join('');
@@ -396,7 +488,7 @@
         '<p class="aqa-item-meta">' + categoryBadge(q.category) +
         '<span class="aqa-role aqa-role--ask">提問</span> ' + esc(q.askerName) + ' · ' + esc(fmtDate(q.createdAt)) + '</p>' +
         '<div class="aqa-detail-body">' + esc(q.body || '（無補充說明）') + '</div>' +
-        imagesHtml(q.images) +
+        attachmentsHtml(q.images, q.files) +
         reviewNoteHtml(q.askReviewStatus, q.askReviewNote) +
         '</article>' +
         '<section class="aqa-answers">' +
@@ -413,7 +505,7 @@
                 '</div>' +
                 '<p class="aqa-item-meta">' + esc(fmtDate(a.createdAt)) + '</p>' +
                 '<div class="aqa-detail-body">' + esc(a.body) + '</div>' +
-                imagesHtml(a.images) +
+                attachmentsHtml(a.images, a.files) +
                 reviewNoteHtml(a.reviewStatus, a.reviewNote) +
                 '</article>'
               );
@@ -431,6 +523,13 @@
             '</label>' +
             '<div id="aqa-answer-preview" class="aqa-img-preview"></div>' +
             '</div>' +
+            '<div class="aqa-upload-row">' +
+            '<label class="aqa-upload-btn">' +
+            '<input id="aqa-answer-files" type="file" accept="' + FILE_ACCEPT + '" multiple />' +
+            '📎 附加檔案（選填，最多 4 個，單檔 10MB）' +
+            '</label>' +
+            '<div id="aqa-answer-files-preview" class="aqa-file-preview"></div>' +
+            '</div>' +
             '<button type="button" id="aqa-submit-answer" class="btn btn-sm btn-solid-emerald mt-2">送出回答</button>' +
             '<p id="aqa-answer-msg" class="aqa-msg hidden"></p>' +
             '</section>'
@@ -439,6 +538,7 @@
       $('aqa-back-list')?.addEventListener('click', closeDetail);
       if (canParticipate) {
         bindImagePicker('aqa-answer-images', 'aqa-answer-preview');
+        bindAttachmentPicker('aqa-answer-files', 'aqa-answer-files-preview', 'file');
         $('aqa-submit-answer')?.addEventListener('click', submitAnswer);
       }
     } catch (err) {
@@ -481,11 +581,13 @@
     }
     try {
       const images = await uploadImages($('aqa-ask-images'));
+      const files = await uploadFiles($('aqa-ask-files'));
       const data = await rpc('admin_qa_ask', {
         p_token: token(),
         p_title: title,
         p_body: body,
         p_images: images,
+        p_files: files,
         p_category: category,
       });
       if (!data?.ok) throw new Error(data?.error || '送出失敗');
@@ -493,6 +595,7 @@
       if ($('aqa-ask-title')) $('aqa-ask-title').value = '';
       if ($('aqa-ask-body')) $('aqa-ask-body').value = '';
       clearImagePicker('aqa-ask-images', 'aqa-ask-preview');
+      clearAttachmentPicker('aqa-ask-files', 'aqa-ask-files-preview');
       if (msg) msg.textContent = data.message || '已送出';
       await loadStats();
       await loadLeaderboard();
@@ -532,11 +635,13 @@
     }
     try {
       const images = await uploadImages($('aqa-answer-images'));
+      const files = await uploadFiles($('aqa-answer-files'));
       const data = await rpc('admin_qa_answer', {
         p_token: token(),
         p_question_id: currentQuestionId,
         p_body: body,
         p_images: images,
+        p_files: files,
       });
       if (!data?.ok) throw new Error(data?.error || '送出失敗');
       await loadStats();
@@ -570,6 +675,7 @@
     $('aqa-filter-category')?.addEventListener('change', onSearchInput);
     $('aqa-submit-ask')?.addEventListener('click', submitAsk);
     bindImagePicker('aqa-ask-images', 'aqa-ask-preview');
+    bindAttachmentPicker('aqa-ask-files', 'aqa-ask-files-preview', 'file');
     $('aqa-list')?.addEventListener('click', function (e) {
       const btn = e.target.closest?.('[data-id]');
       if (!btn?.dataset?.id) return;
