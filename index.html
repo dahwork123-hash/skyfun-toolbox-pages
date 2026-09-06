@@ -919,6 +919,7 @@
         }
         .aqa-participation-notice { margin-bottom: 0.65rem; }
         .aqa-participation-notice p, .aqa-participation-note { margin: 0; }
+        .aqa-participation-team { display: block; margin-top: 0.35rem; font-size: 0.75rem; color: #64748b; }
         .aqa-list-panel { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
         .aqa-list-panel .aqa-section-title { margin-bottom: 0.45rem; font-size: 0.92rem; }
         .aqa-list-scroll {
@@ -4066,7 +4067,7 @@
 
                 <div id="aqa-workspace" class="aqa-workspace">
                     <aside class="aqa-sidebar">
-                        <details class="aqa-ask-fold" open>
+                        <details class="aqa-ask-fold hidden" open>
                             <summary>✏️ 我要提問</summary>
                             <select id="aqa-ask-category" class="aqa-select" required>
                                 <option value="">請選擇問題分類（必填）</option>
@@ -4097,7 +4098,7 @@
                         </details>
 
                         <div id="aqa-participation-notice" class="aqa-participation-notice hidden">
-                            <p>提問與回答僅限<strong>行政管理部</strong>同仁使用，您仍可瀏覽問題與回答。</p>
+                            <p>提問與回答僅限<strong>行政管理部</strong>同仁使用，您仍可瀏覽問題與回答。<span id="aqa-participation-team" class="aqa-participation-team"></span></p>
                         </div>
 
                         <div id="aqa-list-wrap" class="aqa-list-panel">

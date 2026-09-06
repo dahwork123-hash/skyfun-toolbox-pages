@@ -41,15 +41,22 @@
   const ADMIN_QA_TEAM = '行政管理部';
 
   function syncParticipationFromUser() {
-    const team = String(window.ToolboxAuth?.getUser?.()?.team || '').trim();
-    if (team) canParticipate = team === ADMIN_QA_TEAM;
+    const team = String(window.skyfunAuth?.getUser?.()?.team || '').trim();
+    canParticipate = team === ADMIN_QA_TEAM;
   }
 
   function applyParticipationUI() {
     const askFold = document.querySelector('.aqa-ask-fold');
     const notice = $('aqa-participation-notice');
+    const teamEl = $('aqa-participation-team');
+    const team = String(window.skyfunAuth?.getUser?.()?.team || '').trim();
     if (askFold) askFold.classList.toggle('hidden', !canParticipate);
     if (notice) notice.classList.toggle('hidden', canParticipate);
+    if (teamEl) {
+      teamEl.textContent = team
+        ? ('您目前的處別：' + team + (canParticipate ? '' : '（非行政管理部）'))
+        : '您尚未設定處別，請先至登入設定補填。';
+    }
   }
 
   function isAqaSplit() {
@@ -339,6 +346,8 @@
         '<div class="aqa-stat"><strong>回答認列</strong><span>' + esc(data.answerPoints) + ' / ' + esc(data.answerCap) + '</span></div>' +
         '<div class="aqa-stat aqa-stat--rank"><strong>排行榜總點</strong><span>' + esc(data.rankPoints != null ? data.rankPoints : ((data.askTotal || data.askPoints || 0) + (data.answerTotal || data.answerPoints || 0))) + '</span></div>';
     } catch (err) {
+      canParticipate = false;
+      applyParticipationUI();
       el.innerHTML = '<p class="aqa-msg aqa-msg--err">' + esc(err.message || err) + '</p>';
     }
   }
